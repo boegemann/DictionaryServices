@@ -5,15 +5,20 @@ var router = express.Router();
 router.get('/APP', function (req, res, next) {
   res.json({
     app: {
-      id: "Demo",
-      title: "Demo App",
+      id: "DicMan",
+      title: "Dictionary Manager",
       homeScreen: "home",
       header: {
         title: "WCG Dictionary Manager"
       },
       Screens: {
         home: {
-          route: "/"
+          route: "/",
+          text:"home"
+        },
+        other: {
+          route: "/",
+          text:"other"
         }
       }
     }
