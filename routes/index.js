@@ -11,7 +11,7 @@ router.get('/APP', function (req, res, next) {
       header: {
         title: "WCG Dictionary Manager"
       },
-      Screens: {
+      screens: {
         home: {
           route: "/",
           text:"home"
