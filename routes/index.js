@@ -14,11 +14,11 @@ router.get('/APP', function (req, res, next) {
       screens: {
         home: {
           route: "/",
-          text:"home"
+          text:"Welcom Home"
         },
         other: {
           route: "/",
-          text:"other"
+          text:"And now something different"
         }
       }
     }
