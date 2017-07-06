@@ -4,7 +4,7 @@ var router = express.Router();
 /* GET home page. */
 router.get('/APP', function (req, res, next) {
   res.json({
-    App: {
+    app: {
       id: "Demo",
       title: "Demo App",
       homeScreen: "home",
