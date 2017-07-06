@@ -7,13 +7,13 @@ router.get('/APP', function (req, res, next) {
     App: {
       id: "Demo",
       title: "Demo App",
-      homeScreen: home,
+      homeScreen: "home",
       header: {
         title: "WCG Dictionary Manager"
       },
       Screens: {
         home: {
-          route: home
+          route: "/"
         }
       }
     }
