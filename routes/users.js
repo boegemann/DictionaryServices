@@ -3,6 +3,9 @@ var express = require('express'),
   config  = require('../config'),
   jwt = require('jsonwebtoken');
 
+
+var getNewState = require("../application/ApplicationState").getNewState
+
 var app = module.exports = express.Router();
 
 
@@ -86,9 +89,5 @@ app.post('/sessions/create', function(req, res) {
     return res.status(401).send("The username or password don't match");
   }
   console.log(user);
-  res.status(201).send({
-    username:user.username,
-    id_token: createIdToken(user),
-    access_token: createAccessToken()
-  });
+  res.status(201).send(getNewState(true));
 });
