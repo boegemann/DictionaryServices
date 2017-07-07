@@ -5,13 +5,12 @@ var getNewState = require("../application/ApplicationState").getNewState
 
 /* GET home page. */
 router.post('/APP', function (req, res) {
-  security.verifyToken(req.body.access_token).then(function (result) {
-    var hasAccess = result === security.VALID;
 
-    res.json(getNewState(hasAccess, req.body.access_token));
+    getNewState( req.body.access_token, function(state){
+      res.json(state)
+    });
 
 
-  })
 });
 
 module.exports = router;

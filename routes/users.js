@@ -86,5 +86,7 @@ app.post('/sessions/create', function(req, res) {
     return res.status(401).send("The username or password don't match");
   }
   console.log(user);
-  res.status(201).send(getNewState(true, createAccessToken(user)));
+  getNewState(createAccessToken(user),function(state){
+    res.status(201).send(state);
+  });
 });
