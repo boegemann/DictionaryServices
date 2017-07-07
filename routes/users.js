@@ -42,17 +42,14 @@ var users = [{
   password: 'gonto'
 }];
 
-function createIdToken(user) {
-  return jwt.sign(_.omit(user, 'password'), config.secret, { expiresIn: 60*60*5 });
-}
 
-function createAccessToken() {
+function createAccessToken(user) {
   return jwt.sign({
     iss: config.issuer,
     aud: config.audience,
     exp: Math.floor(Date.now() / 1000) + (60),
     scope: 'full_access',
-    sub: "lalaland|gonto",
+    sub: user,
     jti: genJti(), // unique identifier for the token
     alg: 'HS256'
   }, config.secret);
@@ -89,5 +86,5 @@ app.post('/sessions/create', function(req, res) {
     return res.status(401).send("The username or password don't match");
   }
   console.log(user);
-  res.status(201).send(getNewState(true));
+  res.status(201).send(getNewState(true, createAccessToken(user)));
 });

@@ -15,6 +15,10 @@ exports.VALID = VALID;
 exports.EXPIRED = EXPIRED;
 exports.ERROR = ERROR;
 
+exports.getUserId = function(token){
+  return jwt.decode(token).sub.username;
+}
+
 exports.verifyToken = function (token) {
   return new Promise(function (resolve, reject) {
     jwt.verify(token, config.secret, function (err /*, decoded */) {

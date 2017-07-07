@@ -8,7 +8,7 @@ router.post('/APP', function (req, res) {
   security.verifyToken(req.body.access_token).then(function (result) {
     var hasAccess = result === security.VALID;
 
-    res.json(getNewState(hasAccess));
+    res.json(getNewState(hasAccess, req.body.access_token));
 
 
   })

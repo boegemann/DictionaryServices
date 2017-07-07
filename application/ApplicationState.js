@@ -1,13 +1,16 @@
 var express = require('express')
+var security = require ('../security/jwt')
 
 
 var exports = module.exports = {}
 
-exports.getNewState = function (hasAccess) {
+exports.getNewState = function (hasAccess, token) {
   return hasAccess ? {
     auth: {
       isAuthenticated: true,
-      errorMessage: ''
+      errorMessage: '',
+      accessToken:token,
+      userId:security.getUserId(token)
     },
     app: {
       title: "Dictionary Manager",
@@ -32,7 +35,7 @@ exports.getNewState = function (hasAccess) {
       errorMessage: ''
     },
     app: {
-      title: "DWCG Portal",
+      title: "WCG Portal",
       homeScreen: "home",
       header: {
         title: "WCG Portal"
