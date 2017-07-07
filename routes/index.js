@@ -4,6 +4,11 @@ var router = express.Router();
 /* GET home page. */
 router.get('/APP', function (req, res, next) {
   res.json({
+    auth:{
+      isAuthenticated:false,
+      errorMessage:'Login failed'
+    },
+
     app: {
       id: "DicMan",
       title: "Dictionary Manager",
