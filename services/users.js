@@ -21,6 +21,7 @@ var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 
 exports.findLogin = function (username, password, next) {
+  console. log (">>>>>>>>>>>>" + connectString);
   User.findOne({username: username, password: password}, next)
 
 }
