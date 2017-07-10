@@ -1,7 +1,8 @@
 var express = require('express'),
-  _       = require('lodash'),
-  config  = require('../config'),
-  jwt = require('jsonwebtoken');
+  _ = require('lodash'),
+  config = require('../config'),
+  jwt = require('jsonwebtoken'),
+  userService = require('../services/users');
 
 
 var getNewState = require("../application/ApplicationState").getNewState
@@ -13,31 +14,26 @@ function getUserScheme(req) {
 
   var username;
   var type;
-  var userSearch = {};
 
   // The POST contains a username and not an email
-  if(req.body.username) {
+  if (req.body.username) {
     username = req.body.username;
     type = 'username';
-    userSearch = { username: username };
   }
   // The POST contains an email and not an username
-  else if(req.body.email) {
+  else if (req.body.email) {
     username = req.body.email;
     type = 'email';
-    userSearch = { email: username };
   }
 
   return {
     username: username,
-    type: type,
-    userSearch: userSearch
+    type: type
   }
 }
 
 
 var users = [{
-  id: 1,
   username: 'gonto',
   password: 'gonto'
 }];
@@ -56,7 +52,7 @@ function createAccessToken(user) {
 }
 
 // Generate Unique Identifier for the access token
-function genJti(){
+function genJti() {
   var jti = '';
   var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   for (var i = 0; i < 16; i++) {
@@ -67,8 +63,7 @@ function genJti(){
 }
 
 
-
-app.post('/sessions/create', function(req, res) {
+app.post('/sessions/create', function (req, res) {
 
   var userScheme = getUserScheme(req);
 
@@ -76,17 +71,16 @@ app.post('/sessions/create', function(req, res) {
     return res.status(400).send("You must send the username and the password");
   }
 
-  var user = _.find(users, userScheme.userSearch);
-
-  if (!user) {
-    return res.status(401).send("The username or password don't match");
-  }
-
-  if (user.password !== req.body.password) {
-    return res.status(401).send("The username or password don't match");
-  }
-  console.log(user);
-  getNewState(createAccessToken(user),function(state){
-    res.status(201).send(state);
+  var user = userService.findLogin(userScheme.username, req.body.password, function (err, user) {
+    if (!user) {
+      res.status(401).send("The username or password don't match");
+      return;
+    }
+    console.log(user);
+    getNewState(createAccessToken(user), function (state) {
+      res.status(201).send(state);
+    });
   });
+
+
 });
