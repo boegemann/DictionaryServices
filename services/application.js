@@ -35,7 +35,7 @@ var Screen = conn.model('screens', screenSchema);
 
 
 exports.getAppByName = function (appName, next) {
-  Application.findOne({name: appName}, 'definition', next);
+  Application.findOne({name: appName}, 'definition name', next);
 };
 
 exports.getScreenIdByKey = function (appName, screenKey, next) {

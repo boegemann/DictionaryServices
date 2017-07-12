@@ -24,7 +24,7 @@ exports.getNewState = function (token, next) {
       // });
       //
 
-      if (appInfo===null){
+      if (appInfo === null) {
         next(
           {
             "auth": authSection,
@@ -32,13 +32,18 @@ exports.getNewState = function (token, next) {
             "error": "No such application"
           }
         )
-      }else{
+      } else {
         appInfo = appInfo.toObject();
-        appInfo.definition.screen ={"navigate": 'required'};
+        appInfo.definition.screen = {"navigate": 'required'};
         next(
           {
             "auth": authSection,
-            "app": appInfo.definition
+            "app": {
+              header: appInfo.definition.header,
+              screen: {"navigate": 'required'},
+              title: appInfo.definition.title,
+              name: appInfo.name
+            }
           }
         )
       }
