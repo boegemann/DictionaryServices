@@ -14,7 +14,11 @@ router.post('/APP', function (req, res) {
 
 router.post('/Screen', function (req, res) {
   getScreenData(req.body.access_token, req.body.appName, req.body.screenKey, function (screenData) {
-    res.json(screenData.definition)
+    if (screenData==null){
+      res.json({text:'No such page available'});
+    }else{
+      res.json({layout:screenData.definition});
+    }
   });
 });
 

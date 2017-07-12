@@ -26,9 +26,7 @@ var Application = conn.model('apps', appSchema);
 
 var screenSchema = mongoose.Schema({
   name: String,
-  definition: {
-    text: String
-  }
+  definition: [mongoose.Schema.Types.Mixed]
 });
 
 var Screen = conn.model('screens', screenSchema);
@@ -52,11 +50,8 @@ exports.getScreenIdByKey = function (appName, screenKey, next) {
         console.log("Found screen Id: " + results[0].screen)
         Screen.findById(results[0].screen, function (err, screen) {
           if (screen == null) {
-
-            console.log("No screen  ")
             next(null)
           } else {
-            console.log("Found screen  " + screen)
             next(screen.toObject());
           }
         });
