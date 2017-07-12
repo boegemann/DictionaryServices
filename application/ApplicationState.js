@@ -1,63 +1,48 @@
-var express = require('express')
 var security = require('../security/jwt')
+var appService = require('../services/application')
 
 
 var exports = module.exports = {}
 
 exports.getNewState = function (token, next) {
 
-
   security.verifyToken(token).then(function (result) {
 
     var hasAccess = result === security.VALID;
+    var userId = hasAccess ? security.getUserId(token) : security.ANONYMOUS;
 
-    next(hasAccess ? {
-      auth: {
-        isAuthenticated: true,
-        errorMessage: '',
-        accessToken: token,
-        userId: security.getUserId(token)
-      },
-      app: {
-        title: "Dictionary Manager",
-        homeScreen: "home",
-        header: {
-          title: "WCG Dictionary Manager"
-        },
-        screens: {
-          home: {
-            route: "/",
-            text: "Welcome Home"
-          },
-          other: {
-            route: "/",
-            text: "And now something different"
+    var appName = hasAccess ? "DictionaryManager" : security.ANONYMOUS;
+    var authSection = {
+      isAuthenticated: hasAccess,
+      accessToken: token,
+      userId: userId
+    };
+    appService.getAppByName(appName, function (err, appInfo) {
+      //
+      // appService.getScreenIdByKey(appName,'home', function(result){
+      //     console.log(result)
+      // });
+      //
+
+      if (appInfo===null){
+        next(
+          {
+            "auth": authSection,
+            "app": {},
+            "error": "No such application"
           }
-        }
-      }
-    } : {
-      auth: {
-        isAuthenticated: false,
-        errorMessage: ''
-      },
-      app: {
-        title: "WCG Portal",
-        homeScreen: "home",
-        header: {
-          title: "WCG Portal"
-        },
-        screens: {
-          home: {
-            route: "/",
-            text: "Welcome Home"
-          },
-          other: {
-            route: "/",
-            text: "And now something different"
+        )
+      }else{
+        appInfo = appInfo.toObject();
+        appInfo.definition.screen ={"navigate": 'required'};
+        next(
+          {
+            "auth": authSection,
+            "app": appInfo.definition
           }
-        }
+        )
       }
-    })
+    });
   })
-}
+};
 

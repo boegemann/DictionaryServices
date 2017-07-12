@@ -11,9 +11,13 @@ const VALID = 0;
 const EXPIRED = 1;
 const ERROR = 2;
 
+const ANONYMOUS = 'anonymous';
+
 exports.VALID = VALID;
 exports.EXPIRED = EXPIRED;
 exports.ERROR = ERROR;
+
+exports.ANONYMOUS = ANONYMOUS;
 
 exports.getUserId = function(token){
   return jwt.decode(token).sub.username;
@@ -26,7 +30,6 @@ exports.verifyToken = function (token) {
         console.log(err)
         resolve((err.name = 'TokenExpiredError') ? EXPIRED : ERROR);
       } else {
-        console.log("Huh")
         resolve(VALID);
       }
     });
