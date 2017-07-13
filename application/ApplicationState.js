@@ -17,12 +17,11 @@ exports.getNewState = function (token, next) {
       accessToken: token,
       userId: userId
     };
+
+    console.log("Getting data")
     appService.getAppByName(appName, function (err, appInfo) {
-      //
-      // appService.getScreenIdByKey(appName,'home', function(result){
-      //     console.log(result)
-      // });
-      //
+
+      console.log("Got data")
 
       if (appInfo === null) {
         next(
