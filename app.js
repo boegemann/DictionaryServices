@@ -25,8 +25,6 @@ app.use(sassMiddleware({
 }));
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use(index);
-app.use(users);
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -35,6 +33,8 @@ app.use(function(req, res, next) {
 });
 
 
+app.use(index);
+app.use(users);
 
 
 
