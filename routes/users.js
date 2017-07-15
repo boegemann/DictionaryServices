@@ -5,6 +5,14 @@ var express = require('express'),
   userService = require('../services/users');
 
 
+const SET_APP_STATE = 'SET_APP_STATE';
+const setAppState = function (newState)  {
+  return {
+    type: SET_APP_STATE,
+    newState: newState
+  }
+}
+
 var getNewState = require("../application/ApplicationState").getNewState
 
 var app = module.exports = express.Router();
@@ -78,7 +86,7 @@ app.post('/sessions/create', function (req, res) {
     }
     console.log(user);
     getNewState(createAccessToken(user), function (state) {
-      res.status(201).send(state);
+      res.status(201).send([setAppState(state)]);
     });
   });
 
