@@ -37,8 +37,6 @@ exports.getAppByName = function (appName, next) {
 };
 
 exports.getScreenIdByKey = function (appName, screenKey, next) {
-  mongoose.set("debug", true);
-  console.log("-->")
   Application.findOne({name: appName}, "definition.screens", function (err, doc) {
     doc = doc.toObject();
     var result = null;
@@ -47,7 +45,6 @@ exports.getScreenIdByKey = function (appName, screenKey, next) {
         return screen.key === screenKey
       });
       if (results.length > 0) {
-        console.log("Found screen Id: " + results[0].screen)
         Screen.findById(results[0].screen, function (err, screen) {
           if (screen == null) {
             next(null)
@@ -62,7 +59,6 @@ exports.getScreenIdByKey = function (appName, screenKey, next) {
       next(null);
     }
   });
-  mongoose.set("debug", false);
 }
 
 exports.getScreenById = function (screenId, next) {

@@ -6,7 +6,7 @@ var express = require('express'),
 
 
 const SET_APP_STATE = 'SET_APP_STATE';
-const setAppState = function (newState)  {
+const setAppState = function (newState) {
   return {
     type: SET_APP_STATE,
     newState: newState
@@ -85,7 +85,8 @@ app.post('/sessions/create', function (req, res) {
       return;
     }
     console.log(user);
-    getNewState(createAccessToken(user), function (state) {
+    getNewState(createAccessToken(user), "/home", function (state) {
+
       res.status(201).send([setAppState(state)]);
     });
   });

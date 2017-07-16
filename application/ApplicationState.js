@@ -4,12 +4,13 @@ var appService = require('../services/application')
 
 var exports = module.exports = {}
 
-exports.getNewState = function (token, next) {
+exports.getNewState = function (token, nextUrl, next) {
 
   security.verifyToken(token).then(function (result) {
 
     var hasAccess = result === security.VALID;
     var userId = hasAccess ? security.getUserId(token) : security.ANONYMOUS;
+
 
     var appName = hasAccess ? "DictionaryManager" : security.ANONYMOUS;
     var authSection = {
@@ -39,7 +40,7 @@ exports.getNewState = function (token, next) {
             "auth": authSection,
             "app": {
               header: appInfo.definition.header,
-              screen: {"navigate": 'required'},
+              screen: {"navigate": 'required', "nextUrl": nextUrl},
               title: appInfo.definition.title,
               name: appInfo.name
             }

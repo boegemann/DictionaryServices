@@ -24,7 +24,7 @@ const screenDataError = function (error) {
 
 /* GET home page. */
 router.post('/APP', function (req, res) {
-  getNewState(req.body.access_token, function (state) {
+  getNewState(req.body.access_token, null, function (state) {
     res.json(state)
   });
 });
