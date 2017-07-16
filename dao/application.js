@@ -31,26 +31,16 @@ var screenSchema = mongoose.Schema({
 
 var Screen = conn.model('screens', screenSchema);
 
-
-exports.getAppByName = function (appName, next) {
-  Application.findOne({name: appName}, 'definition name', next);
-};
-
 exports.getScreenIdByKey = function (appName, screenKey, next) {
   Application.findOne({name: appName}, "definition.screens", function (err, doc) {
     doc = doc.toObject();
-    var result = null;
-    if (doc != null && doc.definition.screens != null) {
+    if (doc !== null && doc !== undefined && doc.definition.screens !== null && doc.definition.screens !== null) {
       var results = doc.definition.screens.filter(function (screen) {
         return screen.key === screenKey
       });
       if (results.length > 0) {
         Screen.findById(results[0].screen, function (err, screen) {
-          if (screen == null) {
-            next(null)
-          } else {
-            next(screen.toObject());
-          }
+          next((screen === null || screen === undefined) ? null : screen.toObject());
         });
       } else {
         next(null);
@@ -59,11 +49,13 @@ exports.getScreenIdByKey = function (appName, screenKey, next) {
       next(null);
     }
   });
-}
+};
 
 exports.getScreenById = function (screenId, next) {
   Screen.findOne({_id: screenId}, 'definition', next);
 };
 
-
+exports.getAppByName = function (appName, next) {
+  Application.findOne({name: appName}, 'definition name', next);
+};
 

@@ -1,8 +1,7 @@
 var express = require('express'),
-  _ = require('lodash'),
   config = require('../config'),
   jwt = require('jsonwebtoken'),
-  userService = require('../services/users');
+  userService = require('../dao/users');
 
 
 const SET_APP_STATE = 'SET_APP_STATE';
@@ -11,9 +10,9 @@ const setAppState = function (newState) {
     type: SET_APP_STATE,
     newState: newState
   }
-}
+};
 
-var getNewState = require("../application/ApplicationState").getNewState
+var getNewState = require("../uimanagement/ApplicationState").getNewState;
 
 var app = module.exports = express.Router();
 
@@ -39,12 +38,6 @@ function getUserScheme(req) {
     type: type
   }
 }
-
-
-var users = [{
-  username: 'gonto',
-  password: 'gonto'
-}];
 
 
 function createAccessToken(user) {
@@ -79,7 +72,7 @@ app.post('/sessions/create', function (req, res) {
     return res.status(400).send("You must send the username and the password");
   }
 
-  var user = userService.findLogin(userScheme.username, req.body.password, function (err, user) {
+  userService.findLogin(userScheme.username, req.body.password, function (err, user) {
     if (!user) {
       res.status(401).send("The username or password don't match");
       return;
@@ -90,6 +83,4 @@ app.post('/sessions/create', function (req, res) {
       res.status(201).send([setAppState(state)]);
     });
   });
-
-
 });

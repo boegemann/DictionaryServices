@@ -1,9 +1,9 @@
 var express = require('express');
 var router = express.Router();
 var security = require("../security/jwt");
-var getNewState = require("../application/ApplicationState").getNewState;
+var getNewState = require("../uimanagement/ApplicationState").getNewState;
 
-var getScreenData = require("../application/Screens").getScreenData;
+var getScreenData = require("../uimanagement/Screens").getScreenData;
 
 const SCREEN_DATA_SUCCESS = 'SCREEN_DATA_SUCCESS';
 const SCREEN_DATA_FAILURE = 'SCREEN_DATA_FAILURE';
@@ -32,7 +32,7 @@ router.post('/APP', function (req, res) {
 
 router.post('/Screen', function (req, res) {
   getScreenData(req.body.access_token, req.body.appName, req.body.screenKey, function (screenData) {
-    if (screenData == null) {
+    if (screenData === null || screenData === undefined) {
       res.json(screenDataError('No such page available'));
     } else {
       res.json(receiveScreenData({layout: screenData.definition}));

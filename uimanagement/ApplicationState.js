@@ -1,8 +1,8 @@
-var security = require('../security/jwt')
-var appService = require('../services/application')
+var security = require('../security/jwt');
+var appService = require('../dao/application');
 
 
-var exports = module.exports = {}
+var exports = module.exports = {};
 
 exports.getNewState = function (token, nextUrl, next) {
 
@@ -19,10 +19,7 @@ exports.getNewState = function (token, nextUrl, next) {
       userId: userId
     };
 
-    console.log("Getting data")
     appService.getAppByName(appName, function (err, appInfo) {
-
-      console.log("Got data")
 
       if (appInfo === null) {
         next(

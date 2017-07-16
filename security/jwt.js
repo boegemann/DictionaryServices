@@ -1,5 +1,4 @@
 var express = require('express'),
-  _ = require('lodash'),
   config = require('../config'),
   jwt = require('jsonwebtoken');
 
@@ -21,18 +20,18 @@ exports.ANONYMOUS = ANONYMOUS;
 
 exports.getUserId = function(token){
   return jwt.decode(token).sub.username;
-}
+};
 
 exports.verifyToken = function (token) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function (resolve) {
     jwt.verify(token, config.secret, function (err /*, decoded */) {
       if (err) {
-        console.log(err)
+        console.log(err);
         resolve((err.name = 'TokenExpiredError') ? EXPIRED : ERROR);
       } else {
         resolve(VALID);
       }
     });
   });
-}
+};
 
