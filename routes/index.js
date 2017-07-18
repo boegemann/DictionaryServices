@@ -25,9 +25,13 @@ const screenDataError = function (error) {
 /* GET home page. */
 router.post('/APP', function (req, res) {
   getNewState(req.body.access_token, null, function (state) {
+    var pathname = "" + req.body.path;
+    var elements = pathname.split("/");
+    var app = elements.length>1?elements[1]:null;
+    var screen = elements.length>2?elements[2]:null;
     res.json(state)
   });
-});
+});10
 
 
 router.post('/Screen', function (req, res) {

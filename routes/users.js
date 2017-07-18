@@ -1,7 +1,8 @@
 var express = require('express'),
   config = require('../config'),
   jwt = require('jsonwebtoken'),
-  userService = require('../dao/users');
+  userService = require('../dao/users'),
+  security = require('../security/jwt');
 
 
 const SET_APP_STATE = 'SET_APP_STATE';
@@ -40,28 +41,8 @@ function getUserScheme(req) {
 }
 
 
-function createAccessToken(user) {
-  return jwt.sign({
-    iss: config.issuer,
-    aud: config.audience,
-    exp: Math.floor(Date.now() / 1000) + (60),
-    scope: 'full_access',
-    sub: user,
-    jti: genJti(), // unique identifier for the token
-    alg: 'HS256'
-  }, config.secret);
-}
 
-// Generate Unique Identifier for the access token
-function genJti() {
-  var jti = '';
-  var possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  for (var i = 0; i < 16; i++) {
-    jti += possible.charAt(Math.floor(Math.random() * possible.length));
-  }
 
-  return jti;
-}
 
 
 app.post('/sessions/create', function (req, res) {
@@ -78,9 +59,10 @@ app.post('/sessions/create', function (req, res) {
       return;
     }
     console.log(user);
-    getNewState(createAccessToken(user), "/home", function (state) {
-
+    getNewState(security.createAccessToken(user), "/home", function (state) {
       res.status(201).send([setAppState(state)]);
     });
   });
+
+
 });

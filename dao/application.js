@@ -55,7 +55,15 @@ exports.getScreenById = function (screenId, next) {
   Screen.findOne({_id: screenId}, 'definition', next);
 };
 
-exports.getAppByName = function (appName, next) {
-  Application.findOne({name: appName}, 'definition name', next);
+exports.getAppByName = function (appName, next, err) {
+  Application.findOne({name: appName}, function (error, app) {
+    if (error) {
+      if (err) {
+        err(error);
+      }
+    } else {
+      next((app === null || app === undefined) ? null : app.toObject);
+    }
+  });
 };
 
