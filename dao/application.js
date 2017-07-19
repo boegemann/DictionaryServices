@@ -19,7 +19,8 @@ var appSchema = mongoose.Schema({
       title: String
     },
     screens: [{key: String, screen: mongoose.Schema.Types.ObjectId}]
-  }
+  },
+  acceptedPermissions: [String]
 });
 
 var Application = conn.model('apps', appSchema);
@@ -62,7 +63,7 @@ exports.getAppByName = function (appName, next, err) {
         err(error);
       }
     } else {
-      next((app === null || app === undefined) ? null : app.toObject);
+      next((app === null || app === undefined) ? null : app.toObject());
     }
   });
 };

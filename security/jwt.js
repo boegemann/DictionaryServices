@@ -22,6 +22,10 @@ exports.getUserId = function (token) {
   return jwt.decode(token).sub.username;
 };
 
+exports.getUser = function (token) {
+  return jwt.decode(token).sub;
+};
+
 
 // Generate Unique Identifier for the access token
 function genJti() {
