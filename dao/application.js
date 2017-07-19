@@ -13,12 +13,18 @@ conn.on('error', console.error.bind(console, 'connection error:'));
 
 var appSchema = mongoose.Schema({
   name: String,
+  defaultScreen: String,
+  loginScreen: String,
   definition: {
     title: String,
     header: {
       title: String
     },
-    screens: [{key: String, screen: mongoose.Schema.Types.ObjectId}]
+    screens: [{
+      key: String,
+      screen: mongoose.Schema.Types.ObjectId,
+      acceptedPermissions: [String]
+    }]
   },
   acceptedPermissions: [String]
 });
@@ -32,22 +38,26 @@ var screenSchema = mongoose.Schema({
 
 var Screen = conn.model('screens', screenSchema);
 
-exports.getScreenIdByKey = function (appName, screenKey, next) {
-  Application.findOne({name: appName}, "definition.screens", function (err, doc) {
-    doc = doc.toObject();
-    if (doc !== null && doc !== undefined && doc.definition.screens !== null && doc.definition.screens !== null) {
-      var results = doc.definition.screens.filter(function (screen) {
-        return screen.key === screenKey
-      });
-      if (results.length > 0) {
-        Screen.findById(results[0].screen, function (err, screen) {
-          next((screen === null || screen === undefined) ? null : screen.toObject());
+exports.getScreenIdByKey = function (appName, screenKey, next, err) {
+  Application.findOne({name: appName}, "definition.screens", function (error, doc) {
+    if (error && err) {
+      err(error);
+    } else {
+      doc = doc.toObject();
+      if (doc !== null && doc !== undefined && doc.definition.screens !== null && doc.definition.screens !== null) {
+        var results = doc.definition.screens.filter(function (screen) {
+          return screen.key === screenKey
         });
+        if (results.length > 0) {
+          Screen.findById(results[0].screen, function (err, screen) {
+            next((screen === null || screen === undefined) ? null : screen.toObject());
+          });
+        } else {
+          next(null);
+        }
       } else {
         next(null);
       }
-    } else {
-      next(null);
     }
   });
 };
@@ -58,10 +68,8 @@ exports.getScreenById = function (screenId, next) {
 
 exports.getAppByName = function (appName, next, err) {
   Application.findOne({name: appName}, function (error, app) {
-    if (error) {
-      if (err) {
-        err(error);
-      }
+    if (error && err) {
+      err(error);
     } else {
       next((app === null || app === undefined) ? null : app.toObject());
     }

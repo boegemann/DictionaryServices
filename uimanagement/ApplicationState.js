@@ -20,6 +20,8 @@ exports.getActionsForPathChange = function (oldPath, newPath, token, next) {
   var oldPathElements = ("" + oldPath).split("/");
   var descriptor = {
     token: token,
+    oldPath: oldPath,
+    newPath: newPath,
     newAppName: newPathElements.length > 1 ? newPathElements[1] : null,
     newScreenName: newPathElements.length > 2 ? newPathElements[2] : null,
     oldAppName: oldPathElements.length > 1 ? oldPathElements[1] : null,
@@ -60,18 +62,50 @@ function addAppInfo(descriptor, next) {
       }
     } else {
       // check whether app allows anonymous access or user has reqauired permisssions
-      if (app.hasOwnProperty("acceptedPermissions") && (descriptor.user === null || !findOne(app.acceptedPermissions, descriptor.user.permissions))) {
+      if (app.hasOwnProperty("acceptedPermissions") && app.acceptedPermissions.length > 0 &&
+        (descriptor.user === null || !findOne(app.acceptedPermissions, descriptor.user.permissions))) {
         descriptor.errors.push("Access to the application is denied");
         next(descriptor);
       } else {
         descriptor.app = app;
-        next(descriptor);
+        addScreenInfo(descriptor, next);
       }
     }
-  },function(err){
-    decriptor.errors.push(err);
+  }, function (err) {
+    descriptor.errors.push(err);
     next(descriptor);
   });
+}
+
+
+function addScreenInfo(descriptor, next) {
+  if (descriptor.newScreenName == null) {
+    descriptor.newScreenName = descriptor.app.defaultScreen;
+  }
+
+  var appScreenDefintion = descriptor.app.definition.screens.filter(function (screen) {
+    return screen.key === descriptor.newScreenName
+  });
+  if (appScreenDefintion.length===0) {
+    descriptor.errors.push("Screen is not available");
+    next(descriptor);
+  } else {
+    appScreenDefintion=appScreenDefintion[0];
+    appDao.getScreenIdByKey(descriptor.app.name, descriptor.newScreenName, function (screen) {
+      if (screen == null) {
+        descriptor.errors.push("Screen is not available");
+        next(descriptor);
+      } else if (appScreenDefintion.hasOwnProperty("acceptedPermissions") && appScreenDefintion.acceptedPermissions.length > 0 &&
+        (descriptor.user === null || !findOne(appScreenDefintion.acceptedPermissions, descriptor.user.permissions))) {
+        descriptor.errors.push("Access to the screen is denied");
+        next(descriptor);
+      } else {
+        descriptor.screen = screen;
+        next(descriptor);
+      }
+    });
+  }
+
 }
 
 
@@ -82,7 +116,6 @@ exports.getNewState = function (token, nextUrl, next) {
     var hasAccess = result === security.VALID;
     var userId = hasAccess ? security.getUserId(token) : security.ANONYMOUS;
 
-
     var appName = hasAccess ? "DictionaryManager" : security.ANONYMOUS;
     var authSection = {
       isAuthenticated: hasAccess,
@@ -91,7 +124,6 @@ exports.getNewState = function (token, nextUrl, next) {
     };
 
     appDao.getAppByName(appName, function (err, appInfo) {
-
       if (appInfo === null) {
         next(
           {
