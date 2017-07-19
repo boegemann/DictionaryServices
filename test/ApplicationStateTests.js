@@ -126,6 +126,31 @@ describe('ApplicationState', function () {
       })
     });
 
+    it("It should however return the app object if the user is not logged in", function (done) {
+      applicationStateModule.getActionsForPathChange(null, "/DictionaryManager/home", null, function (descriptor) {
+        if (descriptor == null) {
+          done(new Error("No descriptor returned"));
+        } else if (descriptor.app !== null) {
+          assert(descriptor.app.name == 'DictionaryManager', "Wrong app returned");
+          done();
+        } else {
+          done(new Error("No app returned"));
+        }
+      })
+    });
+
+    it("If the user is not logged in it should return the login screen object", function (done) {
+      applicationStateModule.getActionsForPathChange(null, "/DictionaryManager/home", null, function (descriptor) {
+        if (descriptor == null) {
+          done(new Error("No descriptor returned"));
+        } else {
+          assert(descriptor.screen != null, "Screen object was not returned");
+          assert(descriptor.screen.name === "Login", "Wrong screen returned");
+          done();
+        }
+      })
+    });
+
     it("If everything else is ok, it should return the correct screen object", function (done) {
       var token = createTestUserToken();
       applicationStateModule.getActionsForPathChange(null, "/DictionaryManager/home", token, function (descriptor) {

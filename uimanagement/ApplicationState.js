@@ -62,8 +62,9 @@ function addAppInfo(descriptor, next) {
       }
     } else {
       // check whether app allows anonymous access or user has reqauired permisssions
+      // note we not rejecting an anonymous user and postpone the handling of this in screens to allow for a redirect to login
       if (app.hasOwnProperty("acceptedPermissions") && app.acceptedPermissions.length > 0 &&
-        (descriptor.user === null || !findOne(app.acceptedPermissions, descriptor.user.permissions))) {
+        (descriptor.user !== null && !findOne(app.acceptedPermissions, descriptor.user.permissions))) {
         descriptor.errors.push("Access to the application is denied");
         next(descriptor);
       } else {
@@ -86,15 +87,18 @@ function addScreenInfo(descriptor, next) {
   var appScreenDefintion = descriptor.app.definition.screens.filter(function (screen) {
     return screen.key === descriptor.newScreenName
   });
-  if (appScreenDefintion.length===0) {
+  if (appScreenDefintion.length === 0) {
     descriptor.errors.push("Screen is not available");
     next(descriptor);
   } else {
-    appScreenDefintion=appScreenDefintion[0];
+    appScreenDefintion = appScreenDefintion[0];
     appDao.getScreenIdByKey(descriptor.app.name, descriptor.newScreenName, function (screen) {
       if (screen == null) {
         descriptor.errors.push("Screen is not available");
         next(descriptor);
+      } else if (descriptor.user === null && descriptor.app.loginScreen != null && descriptor.app.loginScreen !== descriptor.newScreenName) {
+        descriptor.newScreenName = descriptor.app.loginScreen;
+        addScreenInfo(descriptor, next);
       } else if (appScreenDefintion.hasOwnProperty("acceptedPermissions") && appScreenDefintion.acceptedPermissions.length > 0 &&
         (descriptor.user === null || !findOne(appScreenDefintion.acceptedPermissions, descriptor.user.permissions))) {
         descriptor.errors.push("Access to the screen is denied");
