@@ -57,7 +57,6 @@ exports.verifyToken = function (token) {
     } else {
       jwt.verify(token, config.secret, function (err /*, decoded */) {
         if (err) {
-          console.log(err);
           resolve((err.name = 'TokenExpiredError') ? EXPIRED : ERROR);
         } else {
           resolve(VALID);

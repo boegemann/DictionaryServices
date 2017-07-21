@@ -15,13 +15,57 @@ var findOne = function (haystack, arr) {
   });
 };
 
-exports.getActionsForPathChange = function (oldPath, newPath, token, next) {
+exports.getActionsForNavDescriptor = function (descriptor) {
+  var actions = [];
+  var app = null;
+  var header = null;
+  var screen = null;
+
+  // any navigation requires an entry in the app section to force navigation
+  if ((descriptor.newAppName != null && descriptor.newScreenName != null) &&
+    descriptor.newAppName !== descriptor.oldAppName ||
+    descriptor.newScreenName !== descriptor.oldScreenName) {
+    app = {
+      navigation: {
+        currentUrl: "/" + descriptor.newAppName + "/" + descriptor.newScreenName,
+        pausedPath: descriptor.pausedPath
+      },
+      title: descriptor.app.definition.title,
+      security: {
+        token: descriptor.token
+      }
+    }
+  }
+
+  // next check whether we need a header change, this requires a change of applications:
+  if (descriptor.app != null &&
+    descriptor.newAppName !== descriptor.oldAppName) {
+    header = descriptor.app.definition.header
+  }
+
+  // and now the screen
+  if (descriptor.screen != null &&
+    descriptor.newScreenName !== descriptor.oldScreenName) {
+    screen = descriptor.screen.definition
+  }
+
+  actions.push({
+    type: "SERVER_ACTION",
+    app: app,
+    header: header,
+    screen: screen
+  });
+  return actions;
+};
+
+exports.getNavigationDescriptor = function (oldPath, newPath, token, next) {
   var newPathElements = ("" + newPath).split("/");
   var oldPathElements = ("" + oldPath).split("/");
   var descriptor = {
     token: token,
     oldPath: oldPath,
     newPath: newPath,
+    pausedPath: null,
     newAppName: newPathElements.length > 1 ? newPathElements[1] : null,
     newScreenName: newPathElements.length > 2 ? newPathElements[2] : null,
     oldAppName: oldPathElements.length > 1 ? oldPathElements[1] : null,
@@ -80,7 +124,7 @@ function addAppInfo(descriptor, next) {
 
 
 function addScreenInfo(descriptor, next) {
-  if (descriptor.newScreenName == null) {
+  if (descriptor.newScreenName == null || descriptor.newScreenName.trim() === "") {
     descriptor.newScreenName = descriptor.app.defaultScreen;
   }
 
@@ -96,7 +140,8 @@ function addScreenInfo(descriptor, next) {
       if (screen == null) {
         descriptor.errors.push("Screen is not available");
         next(descriptor);
-      } else if (descriptor.user === null && descriptor.app.loginScreen != null && descriptor.app.loginScreen !== descriptor.newScreenName) {
+      } else if ((appScreenDefintion.hasOwnProperty("acceptedPermissions") && appScreenDefintion.acceptedPermissions.length > 0) && descriptor.user === null && descriptor.app.loginScreen != null) {
+        descriptor.pausedPath = descriptor.newScreenName;
         descriptor.newScreenName = descriptor.app.loginScreen;
         addScreenInfo(descriptor, next);
       } else if (appScreenDefintion.hasOwnProperty("acceptedPermissions") && appScreenDefintion.acceptedPermissions.length > 0 &&
@@ -104,6 +149,9 @@ function addScreenInfo(descriptor, next) {
         descriptor.errors.push("Access to the screen is denied");
         next(descriptor);
       } else {
+        if ((descriptor.app.loginScreen === descriptor.newScreenName) && descriptor.pausedPath === null) {
+          descriptor.pausedPath = descriptor.app.defaultScreen;
+        }
         descriptor.screen = screen;
         next(descriptor);
       }
@@ -137,7 +185,6 @@ exports.getNewState = function (token, nextUrl, next) {
           }
         )
       } else {
-        appInfo = appInfo.toObject();
         appInfo.definition.screen = {"navigate": 'required'};
         next(
           {
