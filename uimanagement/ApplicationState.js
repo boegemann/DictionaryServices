@@ -5,10 +5,7 @@ var exports = module.exports = {};
 const DEFAULT_APP = "WcgPortal";
 
 
-// * @description determine if an array contains one or more items from another array.
-// * @param {array} haystack the array to search.
-// * @param {array} arr the array providing items to check for in the haystack.
-// * @return {boolean} true|false if haystack contains at least one item from arr.
+// determine if an array contains one or more items from another array.
 var findOne = function (haystack, arr) {
   return arr.some(function (v) {
     return haystack.indexOf(v) >= 0;
@@ -22,7 +19,7 @@ exports.getActionsForNavDescriptor = function (descriptor) {
   var screen = null;
 
   // any navigation requires an entry in the app section to force navigation
-  if ((descriptor.newAppName != null && descriptor.newScreenName != null) &&
+  if ((descriptor.newAppName !== null && descriptor.newScreenName !== null) &&
     descriptor.newAppName !== descriptor.oldAppName ||
     descriptor.newScreenName !== descriptor.oldScreenName) {
     app = {
@@ -38,13 +35,13 @@ exports.getActionsForNavDescriptor = function (descriptor) {
   }
 
   // next check whether we need a header change, this requires a change of applications:
-  if (descriptor.app != null &&
+  if (descriptor.app !== null &&
     descriptor.newAppName !== descriptor.oldAppName) {
     header = descriptor.app.definition.header
   }
 
   // and now the screen
-  if (descriptor.screen != null &&
+  if (descriptor.screen !== null &&
     descriptor.newScreenName !== descriptor.oldScreenName) {
     screen = descriptor.screen.definition
   }
@@ -75,18 +72,12 @@ exports.getNavigationDescriptor = function (oldPath, newPath, token, next) {
     notifications: [],
     app: null,
     screen: null,
-    user: null
+    user: token !== null ? security.getUser(token) : null
   };
 
-  addUserInfo(descriptor, next);
+  addAppInfo(descriptor, next);
 };
 
-function addUserInfo(descriptor, next) {
-  security.verifyToken(descriptor.token).then(function (access) {
-    descriptor.user = access === security.VALID ? security.getUser(descriptor.token) : null;
-    addAppInfo(descriptor, next);
-  });
-}
 
 function addAppInfo(descriptor, next) {
 
@@ -124,7 +115,7 @@ function addAppInfo(descriptor, next) {
 
 
 function addScreenInfo(descriptor, next) {
-  if (descriptor.newScreenName == null || descriptor.newScreenName.trim() === "") {
+  if (descriptor.newScreenName === null || descriptor.newScreenName.trim() === "") {
     descriptor.newScreenName = descriptor.app.defaultScreen;
   }
 
@@ -141,7 +132,7 @@ function addScreenInfo(descriptor, next) {
         descriptor.errors.push("Screen is not available");
         next(descriptor);
       } else if ((appScreenDefintion.hasOwnProperty("acceptedPermissions") && appScreenDefintion.acceptedPermissions.length > 0) && descriptor.user === null && descriptor.app.loginScreen != null) {
-        descriptor.pausedPath = descriptor.newScreenName;
+        descriptor.pausedPath = "/" + descriptor.newAppName + "/" + descriptor.newScreenName;
         descriptor.newScreenName = descriptor.app.loginScreen;
         addScreenInfo(descriptor, next);
       } else if (appScreenDefintion.hasOwnProperty("acceptedPermissions") && appScreenDefintion.acceptedPermissions.length > 0 &&
@@ -150,55 +141,13 @@ function addScreenInfo(descriptor, next) {
         next(descriptor);
       } else {
         if ((descriptor.app.loginScreen === descriptor.newScreenName) && descriptor.pausedPath === null) {
-          descriptor.pausedPath = descriptor.app.defaultScreen;
+          descriptor.pausedPath = "/" + descriptor.newAppName + "/" + descriptor.app.defaultScreen;
         }
         descriptor.screen = screen;
         next(descriptor);
       }
     });
   }
-
 }
 
-
-exports.getNewState = function (token, nextUrl, next) {
-
-  security.verifyToken(token).then(function (result) {
-
-    var hasAccess = result === security.VALID;
-    var userId = hasAccess ? security.getUserId(token) : security.ANONYMOUS;
-
-    var appName = hasAccess ? "DictionaryManager" : security.ANONYMOUS;
-    var authSection = {
-      isAuthenticated: hasAccess,
-      accessToken: token,
-      userId: userId
-    };
-
-    appDao.getAppByName(appName, function (err, appInfo) {
-      if (appInfo === null) {
-        next(
-          {
-            "auth": authSection,
-            "app": {},
-            "error": "No such application"
-          }
-        )
-      } else {
-        appInfo.definition.screen = {"navigate": 'required'};
-        next(
-          {
-            "auth": authSection,
-            "app": {
-              header: appInfo.definition.header,
-              screen: {"navigate": 'required', "nextUrl": nextUrl},
-              title: appInfo.definition.title,
-              name: appInfo.name
-            }
-          }
-        )
-      }
-    });
-  })
-};
 

@@ -9,7 +9,6 @@ var sassMiddleware = require('node-sass-middleware');
 var app = express();
 
 var index = require('./routes/index');
-var users = require('./routes/users');
 
 // uncomment after placing your favicon in /public
 //app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
@@ -34,7 +33,6 @@ app.use(function(req, res, next) {
 
 
 app.use(index);
-app.use(users);
 
 
 
