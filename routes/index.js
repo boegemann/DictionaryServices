@@ -7,28 +7,35 @@ var getActionsForNavDescriptor = require("../uimanagement/ApplicationState").get
 var getNavigationDescriptor = require("../uimanagement/ApplicationState").getNavigationDescriptor;
 
 
-const createNavigationActions = function (params, token, next) {
+const createNavigationActions = function (params, token, currentPath, next) {
   getNavigationDescriptor(
     params.oldPath,
     params.newPath,
+    params.data,
     token
     , function (descriptor) {
       next(getActionsForNavDescriptor(descriptor));
     });
 };
 
-const login = function (params, token, next) {
+const login = function (params, token, currentPath, next) {
   userService.findLogin(params.username, params.password, function (err, user) {
     if (!user) {
-      res.status(401).send("The username or password don't match");
-      return;
+      var nextNavigation = {
+        oldPath: params.nextPath,
+        newPath: currentPath,
+        data: {errorMessage:"The username or password don't match"}
+      }
+      createNavigationActions(nextNavigation, null, currentPath, next);
+    }else{
+      var token = security.createAccessToken(user);
+      var nextNavigation = {
+        oldPath: currentPath,
+        newPath: params.nextPath,
+        data: null
+      }
+      createNavigationActions(nextNavigation, token, currentPath, next);
     }
-    var token = security.createAccessToken(user);
-    var nextNavigation = {
-      oldPath: "",
-      newPath: params.nextPath,
-    }
-    createNavigationActions(nextNavigation, token, next);
   });
 };
 
@@ -43,7 +50,7 @@ router.post('/ACTIONS', function (req, res) {
   var service = serviceMap[req.body.service];
   var token = security.verifyAndTouch(req.token);
   if (service != null) {
-    service(req.body.params, token, function (result) {
+    service(req.body.params, token, req.body.currentPath, function (result) {
       res.json(result)
     })
   } else {

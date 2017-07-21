@@ -50,12 +50,13 @@ exports.getActionsForNavDescriptor = function (descriptor) {
     type: "SERVER_ACTION",
     app: app,
     header: header,
-    screen: screen
+    screen: screen,
+    data: descriptor.data
   });
   return actions;
 };
 
-exports.getNavigationDescriptor = function (oldPath, newPath, token, next) {
+exports.getNavigationDescriptor = function (oldPath, newPath, data, token, next) {
   var newPathElements = ("" + newPath).split("/");
   var oldPathElements = ("" + oldPath).split("/");
   var descriptor = {
@@ -72,6 +73,7 @@ exports.getNavigationDescriptor = function (oldPath, newPath, token, next) {
     notifications: [],
     app: null,
     screen: null,
+    data: data != null ? data : {},
     user: token !== null ? security.getUser(token) : null
   };
 
