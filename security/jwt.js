@@ -38,7 +38,7 @@ function genJti() {
   return jti;
 }
 
-exports.createAccessToken = function (user) {
+const createAccessToken = function (user) {
   return jwt.sign({
     iss: config.issuer,
     aud: config.audience,
@@ -50,13 +50,16 @@ exports.createAccessToken = function (user) {
   }, config.secret);
 };
 
+exports.createAccessToken = createAccessToken;
+
 exports.verifyAndTouch = function (token) {
   if (token == null)return null;
   try {
     var decoded = jwt.verify(token, config.secret);
-    decoded.exp = Math.floor(Date.now() / 1000) + (EXPIRY_IN_MINUTES * 60);
-    return jwt.sign(decoded);
+    var user = decoded.sub;
+    return createAccessToken(user);
   } catch (err) {
+    console.error(err);
     return null;
   }
 };

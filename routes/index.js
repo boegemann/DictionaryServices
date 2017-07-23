@@ -48,7 +48,7 @@ const serviceMap = {
 /* GET home page. */
 router.post('/ACTIONS', function (req, res) {
   var service = serviceMap[req.body.service];
-  var token = security.verifyAndTouch(req.token);
+  var token = security.verifyAndTouch(req.body.token);
   if (service != null) {
     service(req.body.params, token, req.body.currentPath, function (result) {
       res.json(result)
