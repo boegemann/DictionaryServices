@@ -146,10 +146,41 @@ function addScreenInfo(descriptor, next) {
           descriptor.pausedPath = "/" + descriptor.newAppName + "/" + descriptor.app.defaultScreen;
         }
         descriptor.screen = screen;
-        next(descriptor);
+        if (screen.services != null && (descriptor.newAppName !== descriptor.oldAppName || descriptor.newScreenName !== descriptor.oldScreenName && screen.services.initial !== null)) {
+          populateServiceData(screen.services.initial, descriptor, next);
+        } else {
+          next(descriptor);
+        }
       }
     });
   }
 }
 
+const populateServiceData = function (services, descriptor, next) {
+  if (services.length > 0) {
+    var serviceDescriptor = services.pop();
+    var serviceStringArray = serviceDescriptor.service.split(":");
+    var service = require('../services/' + serviceStringArray[0])[serviceStringArray[1]];
+    service(function (data) {
+      var storageLocationArray = serviceDescriptor.storage.split(":");
+      if (storageLocationArray[0] === "data") {
+        parentObject = descriptor.data;
+        storageLocationPathArray = storageLocationArray[1].split(".");
+        var lastPath = storageLocationPathArray.pop();
+        storageLocationPathArray.forEach(function (path) {
+          if (parentObject[path] == null) {
+            parentObject[path] = {};
+          }
+          parentObject = parentObject[path];
+        });
+        parentObject[lastPath] = data;
+        populateServiceData(services, descriptor, next);
+      } else {
+        next(descriptor);
+      }
+    });
+  } else {
+    next(descriptor);
+  }
+};
 
