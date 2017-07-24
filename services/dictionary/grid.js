@@ -4,26 +4,34 @@ const url = process.env.dictionaryServiceUrl;
 
 var request = require('request');
 
-function callDictionaryService(serviceName,next){
-  request(url + serviceName, function (error, response, body) {
+function callDictionaryService(serviceName, descriptor, next) {
+
+  request({
+    headers: {
+      'jwt_token': descriptor.token,
+      'Content-Type': 'application/json'
+    },
+    uri: url + serviceName,
+    method: 'GET'
+  }, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       try {
         var result = JSON.parse(body);
         next(result);
-      }catch(err){
+      } catch (err) {
         console.error(err);
-        next (null);
+        next(null);
       }
-    }else{
+    } else {
       console.error(error);
       next(null);
     }
   });
 }
 
-exports.getInitialData = function (next) {
-  callDictionaryService('initialdata', next);
+exports.getInitialData = function (descriptor, next) {
+  callDictionaryService('initialdata', descriptor, next);
 };
-exports.getInitialColumns = function (next) {
-  callDictionaryService('columndef', next);
+exports.getInitialColumns = function (descriptor, next) {
+  callDictionaryService('columndef', descriptor, next);
 };

@@ -5,18 +5,10 @@ var express = require('express'),
 
 var exports = module.exports = {};
 
-
-const VALID = 0;
-const EXPIRED = 1;
-const ERROR = 2;
-const ANONYMOUS = 'anonymous';
+const jwtSecret = process.env.jwtSecret;
 const EXPIRY_IN_MINUTES = 1;
 
-exports.VALID = VALID;
-exports.EXPIRED = EXPIRED;
-exports.ERROR = ERROR;
 
-exports.ANONYMOUS = ANONYMOUS;
 
 exports.getUserId = function (token) {
   return jwt.decode(token).sub.username;
@@ -47,7 +39,7 @@ const createAccessToken = function (user) {
     sub: user,
     // jti: genJti(), // unique identifier for the token
     alg: 'HS256'
-  }, config.secret);
+  }, jwtSecret);
 };
 
 exports.createAccessToken = createAccessToken;
@@ -55,7 +47,7 @@ exports.createAccessToken = createAccessToken;
 exports.verifyAndTouch = function (token) {
   if (token == null)return null;
   try {
-    var decoded = jwt.verify(token, config.secret);
+    var decoded = jwt.verify(token, jwtSecret);
     var user = decoded.sub;
     return createAccessToken(user);
   } catch (err) {
