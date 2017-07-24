@@ -1,32 +1,29 @@
 var exports = module.exports = {};
 
-exports.getInitialColumns = function (next) {
-  next([
-    {
-      name: 'Name',
-      dataIndex: 'name',
-      width: '50%'
-    }, {
-      name: 'Age',
-      dataIndex: 'age',
-      width: '50%'
+const url = process.env.dictionaryServiceUrl;
+
+var request = require('request');
+
+function callDictionaryService(serviceName,next){
+  request(url + serviceName, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      try {
+        var result = JSON.parse(body);
+        next(result);
+      }catch(err){
+        console.error(err);
+        next (null);
+      }
+    }else{
+      console.error(error);
+      next(null);
     }
-  ]);
-};
+  });
+}
 
 exports.getInitialData = function (next) {
-  next([
-    {
-      name: 'Michael Jordan',
-      age: '20'
-    },
-    {
-      name: 'Charles Barkley',
-      age: '47'
-    },
-    {
-      name: 'Ingo',
-      age: '25'
-    }
-  ]);
+  callDictionaryService('initialdata', next);
+};
+exports.getInitialColumns = function (next) {
+  callDictionaryService('columndef', next);
 };
