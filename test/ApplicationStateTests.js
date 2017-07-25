@@ -16,7 +16,7 @@ function createTestUserToken() {
 describe('ApplicationState', function () {
   describe('getNavigationDescriptor', function () {
     it('User should be null if no token provided', function (done) {
-      applicationStateModule.getNavigationDescriptor(null, "", null, function (descriptor) {
+      applicationStateModule.getNavigationDescriptor(null, "", null, null, function (descriptor) {
         if (descriptor == null) {
           done(new Error("No descriptor returned"));
         } else if (descriptor.user !== null) {
@@ -30,7 +30,7 @@ describe('ApplicationState', function () {
     it('User should be populated if token is valid', function (done) {
       var token = createTestUserToken();
 
-      applicationStateModule.getNavigationDescriptor(null, "", token, function (descriptor) {
+      applicationStateModule.getNavigationDescriptor(null, "", null, token, function (descriptor) {
         if (descriptor == null) {
           done(new Error("No descriptor returned"));
         } else if (descriptor.user !== null) {
@@ -47,7 +47,7 @@ describe('ApplicationState', function () {
     it('It should be contain the correct application details if app exists and user has permissions', function (done) {
       var token = createTestUserToken();
 
-      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/home", token, function (descriptor) {
+      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/home", null, token, function (descriptor) {
         if (descriptor == null) {
           done(new Error("No descriptor returned"));
         } else if (descriptor.app !== null) {
@@ -62,7 +62,7 @@ describe('ApplicationState', function () {
     it('It should populate the default app if the requested application is missing or not existent', function (done) {
       var token = createTestUserToken();
 
-      applicationStateModule.getNavigationDescriptor(null, "/Somewhere/sometime", token, function (descriptor) {
+      applicationStateModule.getNavigationDescriptor(null, "/Somewhere/sometime", null, token, function (descriptor) {
         if (descriptor == null) {
           done(new Error("No descriptor returned"));
         } else if (descriptor.app !== null) {
@@ -83,7 +83,7 @@ describe('ApplicationState', function () {
       });
 
 
-      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/home", token, function (descriptor) {
+      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/home", null, token, function (descriptor) {
         if (descriptor == null) {
           done(new Error("No descriptor returned"));
         } else {
@@ -97,7 +97,7 @@ describe('ApplicationState', function () {
     it("It should return an error if the requested screen is not available", function (done) {
       var token = createTestUserToken();
 
-      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/notascreen", token, function (descriptor) {
+      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/notascreen", null, token, function (descriptor) {
         if (descriptor == null) {
           done(new Error("No descriptor returned"));
         } else {
@@ -115,7 +115,7 @@ describe('ApplicationState', function () {
         permissions: ["app:DictionaryManager", "screen:DictionaryManager:nothome"]
       });
 
-      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/home", token, function (descriptor) {
+      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/home", null, token, function (descriptor) {
         if (descriptor == null) {
           done(new Error("No descriptor returned"));
         } else {
@@ -127,7 +127,7 @@ describe('ApplicationState', function () {
     });
 
     it("It should however return the app object if the user is not logged in", function (done) {
-      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/home", null, function (descriptor) {
+      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/home", null, null, function (descriptor) {
         if (descriptor == null) {
           done(new Error("No descriptor returned"));
         } else if (descriptor.app !== null) {
@@ -140,7 +140,7 @@ describe('ApplicationState', function () {
     });
 
     it("If the user is not logged in it should return the login screen object", function (done) {
-      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/home", null, function (descriptor) {
+      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/home", null, null, function (descriptor) {
         if (descriptor == null) {
           done(new Error("No descriptor returned"));
         } else {
@@ -153,7 +153,7 @@ describe('ApplicationState', function () {
 
     it("If everything else is ok, it should return the correct screen object", function (done) {
       var token = createTestUserToken();
-      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/home", token, function (descriptor) {
+      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/home", null, token, function (descriptor) {
         if (descriptor == null) {
           done(new Error("No descriptor returned"));
         } else {
@@ -168,7 +168,7 @@ describe('ApplicationState', function () {
   describe('getActionsForNavDescriptor', function () {
     it('should return a REDIRECT if the oldPath was empty or different to the new path', function (done) {
       var token = createTestUserToken();
-      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/home", token, function (descriptor) {
+      applicationStateModule.getNavigationDescriptor(null, "/DictionaryManager/home", null, token, function (descriptor) {
         var actions = applicationStateModule.getActionsForNavDescriptor(descriptor);
         assert(actions.length > 0, "No actions returned");
         if (actions.length > 0) {

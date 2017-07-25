@@ -15,6 +15,7 @@ exports.getUserId = function (token) {
 };
 
 exports.getUser = function (token) {
+  if (token==null)return null;
   return jwt.decode(token).sub;
 };
 
