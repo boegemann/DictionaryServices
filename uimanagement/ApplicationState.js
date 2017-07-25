@@ -32,7 +32,8 @@ function getActionsForNavDescriptor(descriptor) {
   // any navigation requires an entry in the app section to force navigation
   if ((descriptor.newAppName !== null && descriptor.newScreenName !== null) &&
     descriptor.newAppName !== descriptor.oldAppName ||
-    descriptor.newScreenName !== descriptor.oldScreenName) {
+    descriptor.newScreenName !== descriptor.oldScreenName ||
+    descriptor.newKey !== descriptor.newKey ) {
     app = {
       navigation: {
         currentUrl: "/" + descriptor.newAppName + "/" + descriptor.newScreenName + (descriptor.newKey !== null ? "/" + descriptor.newKey : ""),
@@ -147,7 +148,7 @@ function addScreenInfo(descriptor, next) {
         descriptor.errors.push("Screen is not available");
         next(descriptor);
       } else if ((appScreenDefintion.hasOwnProperty("acceptedPermissions") && appScreenDefintion.acceptedPermissions.length > 0) && descriptor.user === null && descriptor.app.loginScreen != null) {
-        descriptor.pausedPath = "/" + descriptor.newAppName + "/" + descriptor.newScreenName;
+        descriptor.pausedPath = "/" + descriptor.newAppName + "/" + descriptor.newScreenName + (descriptor.newKey !== null ? "/" + descriptor.newKey : "");
         descriptor.newScreenName = descriptor.app.loginScreen;
         addScreenInfo(descriptor, next);
       } else if (appScreenDefintion.hasOwnProperty("acceptedPermissions") && appScreenDefintion.acceptedPermissions.length > 0 &&
@@ -156,7 +157,7 @@ function addScreenInfo(descriptor, next) {
         next(descriptor);
       } else {
         if ((descriptor.app.loginScreen === descriptor.newScreenName) && descriptor.pausedPath === null) {
-          descriptor.pausedPath = "/" + descriptor.newAppName + "/" + descriptor.app.defaultScreen;
+          descriptor.pausedPath = "/" + descriptor.newAppName + "/" + descriptor.app.defaultScreen  + (descriptor.newKey !== null ? "/" + descriptor.newKey : "");
         }
         descriptor.screen = screen;
         if (screen.services != null && (descriptor.newAppName !== descriptor.oldAppName || descriptor.newScreenName !== descriptor.oldScreenName && screen.services.initial !== null)) {
