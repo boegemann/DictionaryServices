@@ -1,22 +1,14 @@
 var express = require('express');
 var router = express.Router();
 var security = require("../security/jwt");
-var userService = require("../dao/users")
-
-var getActionsForNavDescriptor = require("../uimanagement/ApplicationState").getActionsForNavDescriptor;
-var getNavigationDescriptor = require("../uimanagement/ApplicationState").getNavigationDescriptor;
+var userService = require("../dao/users");
+var showDictionaryEntry = require("../services/dictionary/grid").showDictionaryEntry;
 
 
-const createNavigationActions = function (params, token, currentPath, next) {
-  getNavigationDescriptor(
-    params.oldPath,
-    params.newPath,
-    params.data,
-    token
-    , function (descriptor) {
-      next(getActionsForNavDescriptor(descriptor));
-    });
-};
+var createNavigationActions = require("../uimanagement/ApplicationState").createNavigationActions;
+
+
+
 
 const login = function (params, token, currentPath, next) {
   userService.findLogin(params.username, params.password, function (err, user) {
@@ -41,7 +33,8 @@ const login = function (params, token, currentPath, next) {
 
 const serviceMap = {
   navigation: createNavigationActions,
-  login: login
+  login: login,
+  showDictionaryEntry:showDictionaryEntry
 };
 
 

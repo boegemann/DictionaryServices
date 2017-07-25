@@ -1,3 +1,4 @@
+var createNavigationActions = require("../../uimanagement/ApplicationState").createNavigationActions;
 var exports = module.exports = {};
 
 const url = process.env.dictionaryServiceUrl;
@@ -29,11 +30,32 @@ function callDictionaryService(serviceName, descriptor, next) {
   });
 }
 
+exports.createNavigationActions = function (params, token, currentPath, next) {
+  getNavigationDescriptor(
+    params.oldPath,
+    params.newPath,
+    params.data,
+    token
+    , function (descriptor) {
+      next(getActionsForNavDescriptor(descriptor));
+    });
+};
+
+exports.showDictionaryEntry = function (params, token, currentPath, next) {
+  var key = (params.rowData.section + "_" + params.rowData.key).replace(/\./g, '_');
+  var navParams = {
+    oldPath: currentPath,
+    newPath: params.eventInfo.screenUrl + "/" + key,
+    data: null
+  };
+  createNavigationActions(navParams, token, currentPath, next);
+};
+
 exports.getInitialData = function (descriptor, next) {
   callDictionaryService('initialdata', descriptor, next);
 };
 exports.getInitialColumns = function (descriptor, next) {
-  callDictionaryService('languages', descriptor, function (languages){
+  callDictionaryService('languages', descriptor, function (languages) {
     var columns = [
       {
         "name": "Section",
@@ -45,8 +67,8 @@ exports.getInitialColumns = function (descriptor, next) {
         "width": "50px"
       }
     ];
-    if (languages!=null){
-      Object.getOwnPropertyNames(languages).forEach(function (key){
+    if (languages != null) {
+      Object.getOwnPropertyNames(languages).forEach(function (key) {
         columns.push(
           {
             "name": languages[key],
@@ -56,6 +78,26 @@ exports.getInitialColumns = function (descriptor, next) {
         )
       });
     }
-    next (columns)
+    next(columns)
   });
 };
+
+
+exports.getEntryData = function (descriptor, next) {
+  var key = descriptor.newKey;
+  if (key !== null) {
+    var keyParts = key.split("_");
+    if (keyParts.length < 2) {
+      next({});
+    } else {
+      var dicKey = keyParts.pop();
+      var section = keyParts.join(".");
+      next({
+        section: section,
+        key: dicKey
+      });
+    }
+  } else {
+    next({});
+  }
+}

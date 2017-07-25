@@ -12,7 +12,18 @@ var findOne = function (haystack, arr) {
   });
 };
 
-exports.getActionsForNavDescriptor = function (descriptor) {
+exports.createNavigationActions = function (params, token, currentPath, next) {
+  getNavigationDescriptor(
+    params.oldPath,
+    params.newPath,
+    params.data,
+    token
+    , function (descriptor) {
+      next(getActionsForNavDescriptor(descriptor));
+    });
+};
+
+function getActionsForNavDescriptor(descriptor) {
   var actions = [];
   var app = null;
   var header = null;
@@ -24,7 +35,7 @@ exports.getActionsForNavDescriptor = function (descriptor) {
     descriptor.newScreenName !== descriptor.oldScreenName) {
     app = {
       navigation: {
-        currentUrl: "/" + descriptor.newAppName + "/" + descriptor.newScreenName,
+        currentUrl: "/" + descriptor.newAppName + "/" + descriptor.newScreenName + (descriptor.newKey !== null ? "/" + descriptor.newKey : ""),
         pausedPath: descriptor.pausedPath
       },
       title: descriptor.app.definition.title,
@@ -54,9 +65,9 @@ exports.getActionsForNavDescriptor = function (descriptor) {
     data: descriptor.data
   });
   return actions;
-};
+}
 
-exports.getNavigationDescriptor = function (oldPath, newPath, data, token, next) {
+function getNavigationDescriptor(oldPath, newPath, data, token, next) {
   var newPathElements = ("" + newPath).split("/");
   var oldPathElements = ("" + oldPath).split("/");
   var descriptor = {
@@ -66,8 +77,10 @@ exports.getNavigationDescriptor = function (oldPath, newPath, data, token, next)
     pausedPath: null,
     newAppName: newPathElements.length > 1 ? newPathElements[1] : null,
     newScreenName: newPathElements.length > 2 ? newPathElements[2] : null,
+    newKey: newPathElements.length > 3 ? newPathElements[3] : null,
     oldAppName: oldPathElements.length > 1 ? oldPathElements[1] : null,
     oldScreenName: oldPathElements.length > 2 ? oldPathElements[2] : null,
+    oldKey: oldPathElements.length > 3 ? oldPathElements[3] : null,
     errors: [],
     warnings: [],
     notifications: [],
@@ -78,7 +91,7 @@ exports.getNavigationDescriptor = function (oldPath, newPath, data, token, next)
   };
 
   addAppInfo(descriptor, next);
-};
+}
 
 
 function addAppInfo(descriptor, next) {
@@ -161,7 +174,7 @@ const populateServiceData = function (services, descriptor, next) {
     var serviceDescriptor = services.pop();
     var serviceStringArray = serviceDescriptor.service.split(":");
     var service = require('../services/' + serviceStringArray[0])[serviceStringArray[1]];
-    service(descriptor,function (data) {
+    service(descriptor, function (data) {
       var storageLocationArray = serviceDescriptor.storage.split(":");
       if (storageLocationArray[0] === "data") {
         parentObject = descriptor.data;
