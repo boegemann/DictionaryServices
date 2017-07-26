@@ -37,17 +37,6 @@ function callDictionaryService(serviceName, descriptor, method, data, next) {
   });
 }
 
-exports.createNavigationActions = function (params, token, currentPath, next) {
-  getNavigationDescriptor(
-    params.oldPath,
-    params.newPath,
-    params.data,
-    token
-    , function (descriptor) {
-      next(getActionsForNavDescriptor(descriptor));
-    });
-};
-
 exports.showDictionaryEntry = function (params, token, currentPath, next) {
   var key = (params.rowData.section + "_" + params.rowData.key).replace(/\./g, '_');
   var navParams = {
@@ -58,7 +47,7 @@ exports.showDictionaryEntry = function (params, token, currentPath, next) {
   createNavigationActions(navParams, token, currentPath, next);
 };
 
-exports.getInitialData = function (descriptor, next) {
+exports.getDictionaryData = function (descriptor, next) {
   var filter = descriptor.serviceData.dictionaryFilter == null ? {} : descriptor.serviceData.dictionaryFilter;
   callDictionaryService('filter', descriptor, "POST", filter, function (data) {
     next(data)
@@ -122,9 +111,6 @@ exports.dictionaryFilter = function (params, token, currentPath, next) {
     section: section === undefined ? null : section
   };
 
-  // fake descriptor
-  descriptor = {token: token};
-
   var navParams = {
     oldPath: currentPath,
     newPath: currentPath,
@@ -132,18 +118,4 @@ exports.dictionaryFilter = function (params, token, currentPath, next) {
     data: null
   };
   createNavigationActions(navParams, token, currentPath, next);
-
-  // callDictionaryService('filter', descriptor, "POST", filter, function (result) {
-  //   var navParams = {
-  //     oldPath: currentPath,
-  //     newPath: currentPath,
-  //     data:result,
-  //     data: null
-  //   };
-  //   createNavigationActions(navParams, token, currentPath, next);
-  // }
-  // )
-  // ;
-
 }
-;
