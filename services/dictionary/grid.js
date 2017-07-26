@@ -67,17 +67,15 @@ exports.getInitialColumns = function (descriptor, next) {
         "width": "50px"
       }
     ];
-    if (languages != null) {
-      Object.getOwnPropertyNames(languages).forEach(function (key, index) {
-        columns.push(
-          {
-            "name": languages[key],
-            "dataIndex": ["translations", index, "value"],
-            "width": "50px"
-          }
-        )
-      });
-    }
+    languages.forEach(function (language, index) {
+      fields.push(
+        {
+          "name": language.name,
+          "dataIndex": ["translations", index, "value"],
+          "width": "50px"
+        }
+      )
+    });
     next(columns)
   });
 };
@@ -88,14 +86,14 @@ exports.entryLanguageFieldDef = function (descriptor, next) {
     fields = [];
     if (languages != null) {
 
-      Object.getOwnPropertyNames(languages).forEach(function (key, index) {
+      languages.forEach(function (language) {
         fields.push(
           [
             {
               "field": {
-                "label": languages[key] + ":",
-                "placeholder": languages[key],
-                "property": key
+                "label": language.name + ":",
+                "placeholder": language.name,
+                "property": language.locale
               }
             }
           ]

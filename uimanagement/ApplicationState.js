@@ -2,7 +2,7 @@ var security = require('../security/jwt');
 var appDao = require('../dao/application');
 var exports = module.exports = {};
 
-const DEFAULT_APP = "WcgPortal";
+const DEFAULT_APP = "DictionaryManager";
 
 
 // determine if an array contains one or more items from another array.
