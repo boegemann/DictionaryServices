@@ -166,8 +166,8 @@ function addScreenInfo(descriptor, next) {
           descriptor.pausedPath = "/" + descriptor.newAppName + "/" + descriptor.app.defaultScreen + (descriptor.newKey !== null ? "/" + descriptor.newKey : "");
         }
         descriptor.screen = screen;
-        if (screen.services!=null && screen.services.initial !== null) {
-          populateServiceData(screen.services.initial, descriptor, next);
+        if (screen.services!=null) {
+          populateServiceData(screen.services, descriptor, next);
         } else {
           next(descriptor);
         }
