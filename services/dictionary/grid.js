@@ -82,6 +82,30 @@ exports.getInitialColumns = function (descriptor, next) {
   });
 };
 
+exports.entryLanguageFieldDef = function (descriptor, next) {
+
+  callDictionaryService('languages', descriptor, "GET", null, function (languages) {
+    fields = [];
+    if (languages != null) {
+
+      Object.getOwnPropertyNames(languages).forEach(function (key, index) {
+        fields.push(
+          [
+            {
+              "field": {
+                "label": languages[key] + ":",
+                "placeholder": languages[key],
+                "property": key
+              }
+            }
+          ]
+        )
+      });
+    }
+    next(fields)
+  });
+};
+
 
 exports.getEntryData = function (descriptor, next) {
   var key = descriptor.newKey;
