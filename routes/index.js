@@ -3,6 +3,7 @@ var router = express.Router();
 var security = require("../security/jwt");
 var userService = require("../dao/users");
 var showDictionaryEntry = require("../services/dictionary/grid").showDictionaryEntry;
+var dictionaryFilter = require("../services/dictionary/grid").dictionaryFilter
 
 
 var createNavigationActions = require("../uimanagement/ApplicationState").createNavigationActions;
@@ -34,7 +35,8 @@ const login = function (params, token, currentPath, next) {
 const serviceMap = {
   navigation: createNavigationActions,
   login: login,
-  showDictionaryEntry:showDictionaryEntry
+  showDictionaryEntry:showDictionaryEntry,
+  dictionaryFilter:dictionaryFilter
 };
 
 

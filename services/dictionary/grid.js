@@ -5,19 +5,26 @@ const url = process.env.dictionaryServiceUrl;
 
 var request = require('request');
 
-function callDictionaryService(serviceName, descriptor, next) {
+function callDictionaryService(serviceName, descriptor, method, data, next) {
 
-  request({
+  var options = {
     headers: {
       'jwt_token': descriptor.token,
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      json: true
     },
     uri: url + serviceName,
-    method: 'GET'
-  }, function (error, response, body) {
+    method: method
+  }
+
+  if (data != null) {
+    options.json = data;
+  }
+
+  request(options, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       try {
-        var result = JSON.parse(body);
+        var result = method === "POST" ? body : JSON.parse(body);
         next(result);
       } catch (err) {
         console.error(err);
@@ -52,10 +59,14 @@ exports.showDictionaryEntry = function (params, token, currentPath, next) {
 };
 
 exports.getInitialData = function (descriptor, next) {
-  callDictionaryService('initialdata', descriptor, next);
+  var filter = descriptor.serviceData.dictionaryFilter == null ? {} : descriptor.serviceData.dictionaryFilter;
+  callDictionaryService('filter', descriptor, "POST", filter, function (data) {
+    next(data)
+  });
 };
+
 exports.getInitialColumns = function (descriptor, next) {
-  callDictionaryService('languages', descriptor, function (languages) {
+  callDictionaryService('languages', descriptor, "GET", null, function (languages) {
     var columns = [
       {
         "name": "Section",
@@ -68,11 +79,11 @@ exports.getInitialColumns = function (descriptor, next) {
       }
     ];
     if (languages != null) {
-      Object.getOwnPropertyNames(languages).forEach(function (key) {
+      Object.getOwnPropertyNames(languages).forEach(function (key, index) {
         columns.push(
           {
             "name": languages[key],
-            "dataIndex": key,
+            "dataIndex": ["translations", index, "value"],
             "width": "50px"
           }
         )
@@ -100,4 +111,39 @@ exports.getEntryData = function (descriptor, next) {
   } else {
     next({});
   }
+};
+
+exports.dictionaryFilter = function (params, token, currentPath, next) {
+  var key = params.key;
+  var section = params.section;
+
+  var filter = {
+    key: key === undefined ? null : key,
+    section: section === undefined ? null : section
+  };
+
+  // fake descriptor
+  descriptor = {token: token};
+
+  var navParams = {
+    oldPath: currentPath,
+    newPath: currentPath,
+    serviceData: {dictionaryFilter: filter},
+    data: null
+  };
+  createNavigationActions(navParams, token, currentPath, next);
+
+  // callDictionaryService('filter', descriptor, "POST", filter, function (result) {
+  //   var navParams = {
+  //     oldPath: currentPath,
+  //     newPath: currentPath,
+  //     data:result,
+  //     data: null
+  //   };
+  //   createNavigationActions(navParams, token, currentPath, next);
+  // }
+  // )
+  // ;
+
 }
+;

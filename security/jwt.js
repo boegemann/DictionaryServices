@@ -6,7 +6,7 @@ var express = require('express'),
 var exports = module.exports = {};
 
 const jwtSecret = process.env.jwtSecret;
-const EXPIRY_IN_MINUTES = 1;
+const EXPIRY_IN_MINUTES = 10;
 
 
 

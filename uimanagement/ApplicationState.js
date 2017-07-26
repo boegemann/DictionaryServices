@@ -17,6 +17,7 @@ exports.createNavigationActions = function (params, token, currentPath, next) {
     params.oldPath,
     params.newPath,
     params.data,
+    params.serviceData,
     token
     , function (descriptor) {
       next(getActionsForNavDescriptor(descriptor));
@@ -33,7 +34,7 @@ function getActionsForNavDescriptor(descriptor) {
   if ((descriptor.newAppName !== null && descriptor.newScreenName !== null) &&
     descriptor.newAppName !== descriptor.oldAppName ||
     descriptor.newScreenName !== descriptor.oldScreenName ||
-    descriptor.newKey !== descriptor.newKey ) {
+    descriptor.newKey !== descriptor.newKey) {
     app = {
       navigation: {
         currentUrl: "/" + descriptor.newAppName + "/" + descriptor.newScreenName + (descriptor.newKey !== null ? "/" + descriptor.newKey : ""),
@@ -68,7 +69,9 @@ function getActionsForNavDescriptor(descriptor) {
   return actions;
 }
 
-function getNavigationDescriptor(oldPath, newPath, data, token, next) {
+exports.getActionsForNavDescriptor = getActionsForNavDescriptor;
+
+function getNavigationDescriptor(oldPath, newPath, data, serviceData, token, next) {
   var newPathElements = ("" + newPath).split("/");
   var oldPathElements = ("" + oldPath).split("/");
   var descriptor = {
@@ -88,11 +91,14 @@ function getNavigationDescriptor(oldPath, newPath, data, token, next) {
     app: null,
     screen: null,
     data: data != null ? data : {},
+    serviceData: serviceData != null ? serviceData : {},
     user: token !== null ? security.getUser(token) : null
   };
 
   addAppInfo(descriptor, next);
 }
+
+exports.getNavigationDescriptor = getNavigationDescriptor
 
 
 function addAppInfo(descriptor, next) {
@@ -157,10 +163,10 @@ function addScreenInfo(descriptor, next) {
         next(descriptor);
       } else {
         if ((descriptor.app.loginScreen === descriptor.newScreenName) && descriptor.pausedPath === null) {
-          descriptor.pausedPath = "/" + descriptor.newAppName + "/" + descriptor.app.defaultScreen  + (descriptor.newKey !== null ? "/" + descriptor.newKey : "");
+          descriptor.pausedPath = "/" + descriptor.newAppName + "/" + descriptor.app.defaultScreen + (descriptor.newKey !== null ? "/" + descriptor.newKey : "");
         }
         descriptor.screen = screen;
-        if (screen.services != null && (descriptor.newAppName !== descriptor.oldAppName || descriptor.newScreenName !== descriptor.oldScreenName && screen.services.initial !== null)) {
+        if (screen.services!=null && screen.services.initial !== null) {
           populateServiceData(screen.services.initial, descriptor, next);
         } else {
           next(descriptor);
