@@ -47,6 +47,32 @@ exports.showDictionaryEntry = function (params, token, currentPath, next) {
   createNavigationActions(navParams, token, currentPath, next);
 };
 
+exports.getInitialColumns = function (descriptor, next) {
+  callDictionaryService('languages', descriptor, "GET", null, function (languages) {
+    var columns = [
+      {
+        "name": "Section",
+        "dataIndex": "section",
+        "width": "80px"
+      }, {
+        "name": "Key",
+        "dataIndex": "key",
+        "width": "50px"
+      }
+    ];
+    languages.forEach(function (language, index) {
+      columns.push(
+        {
+          "name": language.name,
+          "dataIndex": ["translations", index, "value"],
+          "width": "50px"
+        }
+      )
+    });
+    next(columns)
+  });
+};
+
 exports.getDictionaryData = function (descriptor, next) {
   var filter = descriptor.serviceData.dictionaryFilter == null ? {} : descriptor.serviceData.dictionaryFilter;
   callDictionaryService('filter', descriptor, "POST", filter, function (data) {

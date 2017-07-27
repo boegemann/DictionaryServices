@@ -181,9 +181,6 @@ const populateServiceData = function (services, descriptor, next) {
     var serviceDescriptor = services.pop();
     var serviceStringArray = serviceDescriptor.service.split(":");
     var service = require('../services/' + serviceStringArray[0])[serviceStringArray[1]];
-    console.log(serviceDescriptor)
-    console.log('../services/' + serviceStringArray[0]) + "[" + serviceStringArray + "]"
-    console.log(service)
     service(descriptor, function (data) {
       var storageLocationArray = serviceDescriptor.storage.split(":");
       if (storageLocationArray[0] === "data") {
