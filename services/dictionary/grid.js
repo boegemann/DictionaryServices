@@ -54,32 +54,6 @@ exports.getDictionaryData = function (descriptor, next) {
   });
 };
 
-exports.getInitialColumns = function (descriptor, next) {
-  callDictionaryService('languages', descriptor, "GET", null, function (languages) {
-    var columns = [
-      {
-        "name": "Section",
-        "dataIndex": "section",
-        "width": "80px"
-      }, {
-        "name": "Key",
-        "dataIndex": "key",
-        "width": "50px"
-      }
-    ];
-    languages.forEach(function (language, index) {
-      fields.push(
-        {
-          "name": language.name,
-          "dataIndex": ["translations", index, "value"],
-          "width": "50px"
-        }
-      )
-    });
-    next(columns)
-  });
-};
-
 exports.entryLanguageFieldDef = function (descriptor, next) {
 
   callDictionaryService('languages', descriptor, "GET", null, function (languages) {
