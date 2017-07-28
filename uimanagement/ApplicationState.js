@@ -98,7 +98,7 @@ function getNavigationDescriptor(oldPath, newPath, data, serviceData, token, nex
   addAppInfo(descriptor, next);
 }
 
-exports.getNavigationDescriptor = getNavigationDescriptor
+exports.getNavigationDescriptor = getNavigationDescriptor;
 
 
 function addAppInfo(descriptor, next) {
