@@ -64,7 +64,7 @@ exports.getInitialColumns = function (descriptor, next) {
       columns.push(
         {
           "name": language.name,
-          "dataIndex": ["translations", index, "value"],
+          "dataIndex": ["translations", index, "translation"],
           "width": "50px"
         }
       )
