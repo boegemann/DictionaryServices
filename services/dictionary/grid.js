@@ -64,7 +64,7 @@ exports.getInitialColumns = function (descriptor, next) {
       columns.push(
         {
           "name": language.name,
-          "dataIndex": language.id, // needs to be seen as an bject key rather than an index
+          "dataIndex": "" + language.id, // needs to be seen as an bject key rather than an index
           "width": "50px"
         }
       )
