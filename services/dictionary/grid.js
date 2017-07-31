@@ -49,16 +49,15 @@ exports.showDictionaryEntry = function (params, token, currentPath, next) {
 
 exports.getInitialColumns = function (descriptor, next) {
   callDictionaryService('languages', descriptor, "GET", null, function (languages) {
-    var columns = [
-      {
-        "name": "Section",
-        "dataIndex": "section",
-        "width": "80px"
-      }, {
-        "name": "Key",
-        "dataIndex": "key",
-        "width": "50px"
-      }
+    var columns = [{
+      "name": "Section",
+      "dataIndex": "section",
+      "width": "80px"
+    }, {
+      "name": "Key",
+      "dataIndex": "key",
+      "width": "50px"
+    }
     ];
     languages.forEach(function (language, index) {
       columns.push(
@@ -76,6 +75,9 @@ exports.getInitialColumns = function (descriptor, next) {
 exports.getDictionaryData = function (descriptor, next) {
   var filter = descriptor.serviceData.dictionaryFilter == null ? {} : descriptor.serviceData.dictionaryFilter;
   callDictionaryService('filter', descriptor, "POST", filter, function (data) {
+    data = data.map(function (row) {
+      return Object.assign(row, {id: row.section + "_" + row.key})
+    })
     next(data)
   });
 };
@@ -93,7 +95,7 @@ exports.entryLanguageFieldDef = function (descriptor, next) {
               "field": {
                 "label": language.name + ":",
                 "placeholder": language.name,
-                "property": language.locale
+                "property": "submit."+ language.id
               }
             }
           ]
@@ -114,9 +116,15 @@ exports.getEntryData = function (descriptor, next) {
     } else {
       var dicKey = keyParts.pop();
       var section = keyParts.join(".");
-      next({
-        section: section,
-        key: dicKey
+
+      callDictionaryService('filter', descriptor, "POST", {section: section, key: dicKey}, function (entryData) {
+        console.log(entryData)
+        if (entryData == null || entryData.length !== 1) {
+          descriptor.errors.push("Counld not find " + (entryData != null && entryData.length > 1)) ? "unique " : "" + "result"
+          next({});
+        } else {
+          next(entryData[0]);
+        }
       });
     }
   } else {
