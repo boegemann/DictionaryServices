@@ -133,8 +133,8 @@ exports.getEntryData = function (descriptor, next) {
 };
 
 exports.dictionaryFilter = function (params, token, currentPath, next) {
-  var key = params.key;
-  var section = params.section;
+  var key = params==null?null:params.key;
+  var section = params==null?null:params.section;
 
   var filter = {
     key: key === undefined ? null : key,
