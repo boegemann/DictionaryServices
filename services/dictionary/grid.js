@@ -5,11 +5,11 @@ const url = process.env.dictionaryServiceUrl;
 
 var request = require('request');
 
-function callDictionaryService(serviceName, descriptor, method, data, next) {
+function callDictionaryService(serviceName, token, method, data, next) {
 
   var options = {
     headers: {
-      'jwt_token': descriptor.token,
+      'jwt_token': token,
       'Content-Type': 'application/json',
       json: true
     },
@@ -24,6 +24,7 @@ function callDictionaryService(serviceName, descriptor, method, data, next) {
   request(options, function (error, response, body) {
     if (!error && response.statusCode == 200) {
       try {
+        console.log(body)
         var result = method === "POST" ? body : JSON.parse(body);
         next(result);
       } catch (err) {
@@ -37,6 +38,23 @@ function callDictionaryService(serviceName, descriptor, method, data, next) {
   });
 }
 
+
+exports.saveDictionaryEntry = function (params, token, currentPath, next) {
+  var key = (params.section + "_" + params.key).replace(/\./g, '_');
+
+  callDictionaryService('saveDictionaryEntry', token, "POST", params, function (result) {
+    console.log(">>>>")
+    console.log(result)
+    var navParams = {
+      oldPath: currentPath,
+      newPath: currentPath,
+      data: null
+    };
+    createNavigationActions(navParams, token, currentPath, next);
+
+  });
+};
+
 exports.showDictionaryEntry = function (params, token, currentPath, next) {
   var key = (params.rowData.section + "_" + params.rowData.key).replace(/\./g, '_');
   var navParams = {
@@ -48,7 +66,7 @@ exports.showDictionaryEntry = function (params, token, currentPath, next) {
 };
 
 exports.getInitialColumns = function (descriptor, next) {
-  callDictionaryService('languages', descriptor, "GET", null, function (languages) {
+  callDictionaryService('languages', descriptor.token, "GET", null, function (languages) {
     var columns = [{
       "name": "Section",
       "dataIndex": "section",
@@ -74,7 +92,7 @@ exports.getInitialColumns = function (descriptor, next) {
 
 exports.getDictionaryData = function (descriptor, next) {
   var filter = descriptor.serviceData.dictionaryFilter == null ? {} : descriptor.serviceData.dictionaryFilter;
-  callDictionaryService('filter', descriptor, "POST", filter, function (data) {
+  callDictionaryService('filter', descriptor.token, "POST", filter, function (data) {
     data = data.map(function (row) {
       return Object.assign(row, {id: row.section + "_" + row.key})
     })
@@ -84,7 +102,7 @@ exports.getDictionaryData = function (descriptor, next) {
 
 exports.entryLanguageFieldDef = function (descriptor, next) {
 
-  callDictionaryService('languages', descriptor, "GET", null, function (languages) {
+  callDictionaryService('languages', descriptor.token, "GET", null, function (languages) {
     fields = [];
     if (languages != null) {
 
@@ -95,7 +113,7 @@ exports.entryLanguageFieldDef = function (descriptor, next) {
               "field": {
                 "label": language.name + ":",
                 "placeholder": language.name,
-                "property": "submit."+ language.id
+                "property": "submit." + language.id
               }
             }
           ]
@@ -117,7 +135,7 @@ exports.getEntryData = function (descriptor, next) {
       var dicKey = keyParts.pop();
       var section = keyParts.join(".");
 
-      callDictionaryService('filter', descriptor, "POST", {section: section, key: dicKey}, function (entryData) {
+      callDictionaryService('filter', descriptor.token, "POST", {section: section, key: dicKey}, function (entryData) {
         console.log(entryData)
         if (entryData == null || entryData.length !== 1) {
           descriptor.errors.push("Counld not find " + (entryData != null && entryData.length > 1)) ? "unique " : "" + "result"
@@ -133,8 +151,8 @@ exports.getEntryData = function (descriptor, next) {
 };
 
 exports.dictionaryFilter = function (params, token, currentPath, next) {
-  var key = params==null?null:params.key;
-  var section = params==null?null:params.section;
+  var key = params == null ? null : params.key;
+  var section = params == null ? null : params.section;
 
   var filter = {
     key: key === undefined ? null : key,
