@@ -40,13 +40,19 @@ function callDictionaryService(serviceName, token, method, data, next) {
 
 
 exports.saveDictionaryEntry = function (params, token, currentPath, next) {
-    var key = (params.section + "_" + params.key).replace(/\./g, '_');
+    var pausedPath = params.pausedPath
+    delete params.pausedPath;
     callDictionaryService('saveDictionaryEntry', token, "POST", params, function (result) {
 
 
         if (result == null || result.length !== 1) {
-            // Todo - handle error
-            next({});
+            var navParams = {
+                oldPath: currentPath,
+                newPath: currentPath,
+                pausedPath: pausedPath,
+                data: {errorMessage: "En error occurred during the operation"}
+            };
+            createNavigationActions(navParams, token, next);
         } else {
             result = result[0];
             // as the key might have changed we need to recalculate the url
@@ -57,7 +63,8 @@ exports.saveDictionaryEntry = function (params, token, currentPath, next) {
             var navParams = {
                 oldPath: currentPath,
                 newPath: pathMinusCurrentKey + "/" + key,
-                data: null
+                pausedPath: pausedPath,
+                data: {saved: true, message:"Item saved successfully!"}
             };
             createNavigationActions(navParams, token, next);
         }
@@ -71,9 +78,10 @@ exports.showDictionaryEntry = function (params, token, currentPath, next) {
     var navParams = {
         oldPath: currentPath,
         newPath: params.eventInfo.screenUrl + "/" + key,
+        pausedPath: currentPath,
         data: null
     };
-    createNavigationActions(navParams, token,  next);
+    createNavigationActions(navParams, token, next);
 };
 
 exports.getInitialColumns = function (descriptor, next) {
@@ -176,5 +184,5 @@ exports.dictionaryFilter = function (params, token, currentPath, next) {
         serviceData: {dictionaryFilter: filter},
         data: null
     };
-    createNavigationActions(navParams, token,  next);
+    createNavigationActions(navParams, token, next);
 }
