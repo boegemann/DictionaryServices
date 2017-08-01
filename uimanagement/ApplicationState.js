@@ -34,7 +34,7 @@ function getActionsForNavDescriptor(descriptor) {
   if ((descriptor.newAppName !== null && descriptor.newScreenName !== null) &&
     descriptor.newAppName !== descriptor.oldAppName ||
     descriptor.newScreenName !== descriptor.oldScreenName ||
-    descriptor.newKey !== descriptor.newKey) {
+    descriptor.newKey !== descriptor.oldKey) {
     app = {
       navigation: {
         currentUrl: "/" + descriptor.newAppName + "/" + descriptor.newScreenName + (descriptor.newKey !== null ? "/" + descriptor.newKey : ""),
