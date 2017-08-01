@@ -13,7 +13,7 @@ exports.login = function (params, token, currentPath, next) {
         newPath: currentPath,
         data: {errorMessage:"The username or password don't match"}
       }
-      createNavigationActions(nextNavigation, null, currentPath, next);
+      createNavigationActions(nextNavigation, null,  next);
     }else{
       var token = security.createAccessToken(user);
       var nextNavigation = {
@@ -21,7 +21,7 @@ exports.login = function (params, token, currentPath, next) {
         newPath: params.nextPath,
         data: null
       }
-      createNavigationActions(nextNavigation, token, currentPath, next);
+      createNavigationActions(nextNavigation, token,  next);
     }
   });
 };

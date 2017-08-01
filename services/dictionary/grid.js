@@ -59,7 +59,7 @@ exports.saveDictionaryEntry = function (params, token, currentPath, next) {
                 newPath: pathMinusCurrentKey + "/" + key,
                 data: null
             };
-            createNavigationActions(navParams, token, currentPath, next);
+            createNavigationActions(navParams, token, next);
         }
 
 
@@ -73,7 +73,7 @@ exports.showDictionaryEntry = function (params, token, currentPath, next) {
         newPath: params.eventInfo.screenUrl + "/" + key,
         data: null
     };
-    createNavigationActions(navParams, token, currentPath, next);
+    createNavigationActions(navParams, token,  next);
 };
 
 exports.getInitialColumns = function (descriptor, next) {
@@ -176,5 +176,5 @@ exports.dictionaryFilter = function (params, token, currentPath, next) {
         serviceData: {dictionaryFilter: filter},
         data: null
     };
-    createNavigationActions(navParams, token, currentPath, next);
+    createNavigationActions(navParams, token,  next);
 }
