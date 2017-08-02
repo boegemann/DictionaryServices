@@ -38,6 +38,35 @@ function callDictionaryService(serviceName, token, method, data, next) {
     });
 }
 
+exports.deleteDictionaryEntry = function (params, token, currentPath, next) {
+    var filter = {
+        section:params.rowData.section,
+        key:params.rowData.key
+    }
+
+    callDictionaryService('deleteEntry', token, "POST", filter, function (result) {
+
+
+        if (result == null || result !== 1) {
+            var navParams = {
+                oldPath: currentPath,
+                newPath: currentPath,
+                data: {errorMessage: "An error occurred during the operation"}
+            };
+            createNavigationActions(navParams, token, next);
+        } else {
+            var navParams = {
+                oldPath: currentPath,
+                newPath: currentPath,
+                data: {removed: true, message:"Item removed successfully!"}
+            };
+            createNavigationActions(navParams, token, next);
+        }
+
+
+    });
+}
+
 
 exports.saveDictionaryEntry = function (params, token, currentPath, next) {
     var pausedPath = params.pausedPath
@@ -50,7 +79,7 @@ exports.saveDictionaryEntry = function (params, token, currentPath, next) {
                 oldPath: currentPath,
                 newPath: currentPath,
                 pausedPath: pausedPath,
-                data: {errorMessage: "En error occurred during the operation"}
+                data: {errorMessage: "An error occurred during the operation"}
             };
             createNavigationActions(navParams, token, next);
         } else {
@@ -71,6 +100,16 @@ exports.saveDictionaryEntry = function (params, token, currentPath, next) {
 
 
     });
+};
+
+exports.addDictionaryEntry = function (params, token, currentPath, next) {
+    var navParams = {
+        oldPath: currentPath,
+        newPath: params.eventInfo.screenUrl,
+        pausedPath: currentPath,
+        data: null
+    };
+    createNavigationActions(navParams, token, next);
 };
 
 exports.showDictionaryEntry = function (params, token, currentPath, next) {
