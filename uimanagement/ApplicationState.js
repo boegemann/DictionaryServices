@@ -28,6 +28,8 @@ function forceEmptyString(o) {
 function createNavigationActions(params, token, next) {
     var newPathElements = (forceEmptyString(forceEmptyObject(params).newPath)).split("/");
     var oldPathElements = (forceEmptyString(forceEmptyObject(params).oldPath)).split("/");
+    var user = token !== null ? security.getUser(token) : null;
+
     var descriptor = {
         token: token,
         oldPath: forceNull(forceEmptyObject(params).oldPath),
@@ -46,7 +48,9 @@ function createNavigationActions(params, token, next) {
         screen: null,
         data: forceEmptyObject(forceEmptyObject(params).data),
         serviceData: forceEmptyObject(forceEmptyObject(params).serviceData),
-        user: token !== null ? security.getUser(token) : null
+        user: user,
+        locales: user !== null ? user.locales : {},
+        locale: params.locale
     };
 
     addAppInfo(descriptor, function (descriptor) {
@@ -63,6 +67,7 @@ function getActionsForNavDescriptor(descriptor) {
     var app = null;
     var header = null;
     var screen = null;
+    var locale = null;
 
     // any navigation requires an entry in the app section to force navigation
     if ((descriptor.newAppName !== null && descriptor.newScreenName !== null) &&
@@ -87,6 +92,11 @@ function getActionsForNavDescriptor(descriptor) {
         header = descriptor.app.definition.header
     }
 
+    locale = {
+        locales: descriptor.user !== null ? descriptor.user.locales : {},
+        current: descriptor.locale
+    };
+
     // and now the screen
     if (descriptor.screen !== null &&
         descriptor.newScreenName !== descriptor.oldScreenName) {
@@ -98,6 +108,7 @@ function getActionsForNavDescriptor(descriptor) {
         app: app,
         header: header,
         screen: screen,
+        locale:locale,
         data: descriptor.data
     });
     return actions;

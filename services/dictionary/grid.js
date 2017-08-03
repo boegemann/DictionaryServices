@@ -38,7 +38,7 @@ function callDictionaryService(serviceName, token, method, data, next) {
     });
 }
 
-exports.deleteDictionaryEntry = function (params, token, currentPath, next) {
+exports.deleteDictionaryEntry = function (params, token, currentPath, locale, next) {
     var filter = {
         section:params.rowData.section,
         key:params.rowData.key
@@ -51,6 +51,7 @@ exports.deleteDictionaryEntry = function (params, token, currentPath, next) {
             var navParams = {
                 oldPath: currentPath,
                 newPath: currentPath,
+                locale:locale,
                 data: {errorMessage: "An error occurred during the operation"}
             };
             createNavigationActions(navParams, token, next);
@@ -58,6 +59,7 @@ exports.deleteDictionaryEntry = function (params, token, currentPath, next) {
             var navParams = {
                 oldPath: currentPath,
                 newPath: currentPath,
+                locale:locale,
                 data: {removed: true, message:"Item removed successfully!"}
             };
             createNavigationActions(navParams, token, next);
@@ -68,7 +70,7 @@ exports.deleteDictionaryEntry = function (params, token, currentPath, next) {
 }
 
 
-exports.saveDictionaryEntry = function (params, token, currentPath, next) {
+exports.saveDictionaryEntry = function (params, token, currentPath, locale, next) {
     var pausedPath = params.pausedPath
     delete params.pausedPath;
     callDictionaryService('saveDictionaryEntry', token, "POST", params, function (result) {
@@ -79,6 +81,7 @@ exports.saveDictionaryEntry = function (params, token, currentPath, next) {
                 oldPath: currentPath,
                 newPath: currentPath,
                 pausedPath: pausedPath,
+                locale:locale,
                 data: {errorMessage: "An error occurred during the operation"}
             };
             createNavigationActions(navParams, token, next);
@@ -93,6 +96,7 @@ exports.saveDictionaryEntry = function (params, token, currentPath, next) {
                 oldPath: currentPath,
                 newPath: pathMinusCurrentKey + "/" + key,
                 pausedPath: pausedPath,
+                locale:locale,
                 data: {saved: true, message:"Item saved successfully!"}
             };
             createNavigationActions(navParams, token, next);
@@ -102,22 +106,24 @@ exports.saveDictionaryEntry = function (params, token, currentPath, next) {
     });
 };
 
-exports.addDictionaryEntry = function (params, token, currentPath, next) {
+exports.addDictionaryEntry = function (params, token, currentPath, locale, next) {
     var navParams = {
         oldPath: currentPath,
         newPath: params.eventInfo.screenUrl,
         pausedPath: currentPath,
+        locale:locale,
         data: null
     };
     createNavigationActions(navParams, token, next);
 };
 
-exports.showDictionaryEntry = function (params, token, currentPath, next) {
+exports.showDictionaryEntry = function (params, token, currentPath, locale, next) {
     var key = (params.rowData.section + "_" + params.rowData.key).replace(/\./g, '_');
     var navParams = {
         oldPath: currentPath,
         newPath: params.eventInfo.screenUrl + "/" + key,
         pausedPath: currentPath,
+        locale:locale,
         data: null
     };
     createNavigationActions(navParams, token, next);
@@ -208,7 +214,7 @@ exports.getEntryData = function (descriptor, next) {
     }
 };
 
-exports.dictionaryFilter = function (params, token, currentPath, next) {
+exports.dictionaryFilter = function (params, token, currentPath, locale, next) {
     var key = params == null ? null : params.key;
     var section = params == null ? null : params.section;
 
@@ -221,6 +227,7 @@ exports.dictionaryFilter = function (params, token, currentPath, next) {
         oldPath: currentPath,
         newPath: currentPath,
         serviceData: {dictionaryFilter: filter},
+        locale:locale,
         data: null
     };
     createNavigationActions(navParams, token, next);
