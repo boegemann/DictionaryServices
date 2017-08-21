@@ -1,6 +1,7 @@
 var security = require('../security/jwt');
 var appDao = require('../dao/application');
 var exports = module.exports = {};
+var i18n = require("i18next");
 
 const DEFAULT_APP = "DictionaryManager";
 
@@ -108,7 +109,7 @@ function getActionsForNavDescriptor(descriptor) {
         app: app,
         header: header,
         screen: screen,
-        locale:locale,
+        locale: locale,
         data: descriptor.data
     });
     return actions;

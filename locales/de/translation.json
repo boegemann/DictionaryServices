@@ -1,0 +1,22 @@
+{
+  "dictionary": {
+    "app": {
+      "title": "Wörterbuch Service",
+      "functions": {
+        "filter": "Filter",
+        "cancel": "Abbruch",
+        "save": "Speicher"
+      }
+    },
+    "entry": {
+      "title": "Eintrag",
+      "key": "Schlüßel",
+      "section": "Sektion"
+    },
+    "languages": {
+      "en": "Englisch",
+      "de": "Deutsch",
+      "fr": "Französisch"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "dictionary": {
+    "app": {
+      "title": "Dictionary Service",
+      "functions": {
+        "filter": "Filter",
+        "cancel": "Cancel",
+        "save": "Save"
+      }
+    },
+    "entry": {
+      "title": "Entry",
+      "key": "Key",
+      "section": "Section"
+    },
+    "languages": {
+      "en": "English",
+      "de": "German",
+      "fr": "French"
+    }
+  }
+}

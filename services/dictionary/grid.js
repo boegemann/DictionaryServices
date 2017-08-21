@@ -24,7 +24,6 @@ function callDictionaryService(serviceName, token, method, data, next) {
     request(options, function (error, response, body) {
         if (!error && response.statusCode == 200) {
             try {
-                console.log(body)
                 var result = method === "POST" ? body : JSON.parse(body);
                 next(result);
             } catch (err) {
@@ -172,7 +171,7 @@ exports.entryLanguageFieldDef = function (descriptor, next) {
                     [
                         {
                             "field": {
-                                "label": language.name + ":",
+                                "label": language.name,
                                 "placeholder": language.name,
                                 "property": "submit." + language.id
                             }
@@ -200,7 +199,6 @@ exports.getEntryData = function (descriptor, next) {
                 section: section,
                 key: dicKey
             }, function (entryData) {
-                console.log(entryData)
                 if (entryData == null || entryData.length !== 1) {
                     descriptor.errors.push("Counld not find " + (entryData != null && entryData.length > 1)) ? "unique " : "" + "result"
                     next({});
