@@ -38,12 +38,16 @@ function callDictionaryService(serviceName, token, method, data, next) {
 }
 
 exports.deleteDictionaryEntry = function (params, token, currentPath, locale, next) {
-    var filter = {
-        section:params.rowData.section,
-        key:params.rowData.key
-    }
 
-    callDictionaryService('deleteEntry', token, "POST", filter, function (result) {
+    var filters = params.rowData.map(function(row){
+        return {
+            section:row.section,
+            key:row.key
+        }
+    });
+
+
+    callDictionaryService('deleteEntry', token, "POST", filters, function (result) {
 
 
         if (result == null || result !== 1) {
@@ -131,21 +135,18 @@ exports.showDictionaryEntry = function (params, token, currentPath, locale, next
 exports.getInitialColumns = function (descriptor, next) {
     callDictionaryService('languages', descriptor.token, "GET", null, function (languages) {
         var columns = [{
-            "name": "Section",
-            "dataIndex": "section",
-            "width": "80px"
+            "title": "Section",
+            "name": "section"
         }, {
-            "name": "Key",
-            "dataIndex": "key",
-            "width": "50px"
+            "title": "Key",
+            "name": "key"
         }
         ];
         languages.forEach(function (language, index) {
             columns.push(
                 {
-                    "name": language.name,
-                    "dataIndex": "" + language.id, // needs to be seen as an bject key rather than an index
-                    "width": "50px"
+                    "title": language.name,
+                    "name": "" + language.id // needs to be seen as an bject key rather than an index
                 }
             )
         });
